@@ -168,27 +168,38 @@ When modifying the schema:
   - User dashboard with statistics
   - Session history and analytics
 
-## Next Steps: Phase 4 or Phase 6
+- ✅ **Phase 4: UI/UX Polish** - Complete ([details](PHASE4_COMPLETE.md))
+  - Enhanced landing page with animations
+  - Framer Motion integration
+  - Toast notification system
+  - Mobile-first responsive design
+  - Professional visual polish
 
-**Option 1: Phase 4 - UI/UX Polish**
-- Improve landing page design
-- Add animations and transitions
-- Enhanced mobile responsiveness
-- Accessibility improvements
+- ✅ **Phase 6: Custom ML Model** - Code Complete ([details](PHASE6_COMPLETE.md))
+  - Data collection tool built
+  - PyTorch model architecture designed
+  - Training pipeline implemented
+  - Model export to TensorFlow.js ready
+  - Ready for data collection and training
 
-**Option 2: Phase 6 - Custom ML Model (Recommended)**
-- Collect ASL gesture dataset
-- Train PyTorch model
-- Convert to TensorFlow.js
-- Implement real sign recognition
+## Next Steps: Data Collection & Training
 
-See [plan.md](plan.md) for the complete project roadmap.
+The ML pipeline is complete! To finish Phase 6:
+
+1. **Collect Data**: Visit `/collect` to gather training samples
+2. **Train Model**: Run training scripts in `backend/training/`
+3. **Integrate**: Load trained model in practice page
+4. **Test**: Verify real-time sign recognition
+
+See [backend/training/README.md](backend/training/README.md) for detailed instructions.
 
 ## Additional Documentation
 
 - [QUICKSTART.md](QUICKSTART.md) - Fast setup guide
 - [RUN_WITHOUT_SUPABASE.md](RUN_WITHOUT_SUPABASE.md) - Local-only development
 - [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) - OAuth configuration guide
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues and solutions
+- [backend/training/README.md](backend/training/README.md) - ML training guide
 
 ## Project Goal
 
