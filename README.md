@@ -149,15 +149,46 @@ When modifying the schema:
 2. Run in Supabase SQL Editor
 3. Update SQLAlchemy models in `backend/database/models.py`
 
-## Next Steps: Phase 2 - ML Integration
+## Project Status
 
-Phase 2 will focus on:
-- [ ] Integrating MediaPipe Hands
-- [ ] Finding/integrating pre-trained gesture model
-- [ ] Building camera feed component
-- [ ] Testing real-time detection
+- ✅ **Phase 1: Foundation** - Complete ([details](PHASE1_COMPLETE.md))
+  - Next.js 14 + FastAPI setup
+  - Database schema and API endpoints
+  - Development environment
+
+- ✅ **Phase 2: ML Integration** - Complete ([details](PHASE2_COMPLETE.md))
+  - MediaPipe Hands integration
+  - Real-time hand tracking
+  - Camera feed component
+  - UI pages (Landing, Practice, Lessons)
+
+- ✅ **Phase 3: Core Features** - Complete ([details](PHASE3_COMPLETE.md))
+  - Authentication (Email/Password + Google OAuth)
+  - Progress tracking system
+  - User dashboard with statistics
+  - Session history and analytics
+
+## Next Steps: Phase 4 or Phase 6
+
+**Option 1: Phase 4 - UI/UX Polish**
+- Improve landing page design
+- Add animations and transitions
+- Enhanced mobile responsiveness
+- Accessibility improvements
+
+**Option 2: Phase 6 - Custom ML Model (Recommended)**
+- Collect ASL gesture dataset
+- Train PyTorch model
+- Convert to TensorFlow.js
+- Implement real sign recognition
 
 See [plan.md](plan.md) for the complete project roadmap.
+
+## Additional Documentation
+
+- [QUICKSTART.md](QUICKSTART.md) - Fast setup guide
+- [RUN_WITHOUT_SUPABASE.md](RUN_WITHOUT_SUPABASE.md) - Local-only development
+- [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md) - OAuth configuration guide
 
 ## Project Goal
 
