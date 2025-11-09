@@ -58,6 +58,21 @@ def prepare_dataset(data_dir: str = 'data', output_dir: str = 'data/processed'):
     print(f"Number of unique signs: {len(np.unique(y))}")
     print(f"Signs: {np.unique(y)}")
 
+    # Filter out classes with too few samples (need at least 10 for proper splitting)
+    from collections import Counter
+    label_counts = Counter(y)
+    min_samples = 10
+
+    # Remove underrepresented classes
+    filtered_indices = [i for i, label in enumerate(y) if label_counts[label] >= min_samples]
+    X = X[filtered_indices]
+    y = y[filtered_indices]
+
+    removed_classes = [label for label, count in label_counts.items() if count < min_samples]
+    if removed_classes:
+        print(f"\n⚠️  Removed classes with < {min_samples} samples: {removed_classes}")
+        print(f"Remaining samples: {len(X)}")
+
     # Create label mapping
     unique_labels = sorted(np.unique(y))
     label_to_idx = {label: idx for idx, label in enumerate(unique_labels)}

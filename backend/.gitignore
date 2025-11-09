@@ -1,1 +1,76 @@
+# Environment variables
 .env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+ENV/
+env/
+*.egg
+
+# Training data (large datasets)
+/training/data/archive/
+/training/data/processed/
+/training/data/*.json
+!/training/data/.gitkeep
+
+# Model files (large binary files)
+*.pth
+*.pt
+*.onnx
+*.h5
+*.pb
+*.tflite
+*.pkl
+*.pickle
+
+# Data files
+*.npy
+*.npz
+*.hdf5
+*.h5
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup

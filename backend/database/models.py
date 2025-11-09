@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from datetime import datetime
+from uuid import UUID
 
 Base = declarative_base()
 
@@ -44,7 +45,7 @@ class PracticeSession(Base):
     user_id = Column(String, nullable=False, index=True)
     sign_detected = Column(String)
     confidence = Column(Float)
-    is_correct = Column(Integer)  # 0 or 1
+    is_correct = Column(Integer, nullable=True)  # 0, 1, or None
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -86,6 +87,14 @@ class UserProgressResponse(UserProgressBase):
     last_practiced: datetime
     created_at: datetime
 
+    @field_validator('user_id', mode='before')
+    @classmethod
+    def convert_user_id_to_string(cls, v):
+        """Convert UUID to string if needed"""
+        if isinstance(v, UUID):
+            return str(v)
+        return str(v) if v is not None else v
+
     class Config:
         from_attributes = True
 
@@ -94,7 +103,7 @@ class PracticeSessionCreate(BaseModel):
     user_id: str
     sign_detected: str
     confidence: float
-    is_correct: bool
+    is_correct: Optional[bool] = None
 
 
 class PracticeSessionResponse(BaseModel):
@@ -102,8 +111,16 @@ class PracticeSessionResponse(BaseModel):
     user_id: str
     sign_detected: str
     confidence: float
-    is_correct: bool
+    is_correct: Optional[int] = None  # 0, 1, or None
     timestamp: datetime
+
+    @field_validator('user_id', mode='before')
+    @classmethod
+    def convert_user_id_to_string(cls, v):
+        """Convert UUID to string if needed"""
+        if isinstance(v, UUID):
+            return str(v)
+        return str(v) if v is not None else v
 
     class Config:
         from_attributes = True

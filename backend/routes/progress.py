@@ -62,7 +62,7 @@ async def record_practice_session(
         user_id=session.user_id,
         sign_detected=session.sign_detected,
         confidence=session.confidence,
-        is_correct=1 if session.is_correct else 0
+        is_correct=1 if session.is_correct is True else (0 if session.is_correct is False else None)
     )
     db.add(db_session)
     db.commit()
