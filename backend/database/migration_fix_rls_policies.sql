@@ -2,10 +2,16 @@
 -- The backend connects via PostgreSQL connection (not Supabase auth),
 -- so auth.uid() is NULL. We need to allow inserts from the backend.
 
--- Drop existing restrictive policies
+-- Drop ALL existing policies for these tables
 DROP POLICY IF EXISTS "Users can insert their own sessions" ON practice_sessions;
+DROP POLICY IF EXISTS "Users can view their own sessions" ON practice_sessions;
+DROP POLICY IF EXISTS "Allow backend to insert sessions" ON practice_sessions;
+
 DROP POLICY IF EXISTS "Users can insert their own progress" ON user_progress;
 DROP POLICY IF EXISTS "Users can update their own progress" ON user_progress;
+DROP POLICY IF EXISTS "Users can view their own progress" ON user_progress;
+DROP POLICY IF EXISTS "Allow backend to insert progress" ON user_progress;
+DROP POLICY IF EXISTS "Allow backend to update progress" ON user_progress;
 
 -- Create new policies that allow backend inserts
 -- For practice_sessions: Allow all inserts (backend will validate user_id)
