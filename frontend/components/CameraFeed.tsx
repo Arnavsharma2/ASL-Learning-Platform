@@ -44,12 +44,10 @@ export function CameraFeed({
           const canvas = canvasRef.current;
           if (!canvas) return;
 
-          const ctx = canvas.getContext('2d', { 
-            willReadFrequently: false // Optimize for drawing, not reading
-          });
+          const ctx = canvas.getContext('2d');
           if (!ctx) return;
 
-          // Draw the hands on canvas (already optimized with requestAnimationFrame)
+          // Draw the hands on canvas
           drawHands(ctx, results, width, height);
 
           // Only update state when hand count actually changes to avoid unnecessary re-renders
@@ -161,14 +159,7 @@ export function CameraFeed({
           <video
             ref={videoRef}
             className="absolute top-0 left-0 opacity-0"
-            style={{ 
-              width, 
-              height,
-              transform: 'translateZ(0)', // Force hardware acceleration
-              pointerEvents: 'none' // Prevent interaction
-            }}
-            playsInline
-            muted
+            style={{ width, height }}
           />
 
           {/* Canvas for drawing hand landmarks */}
@@ -177,9 +168,6 @@ export function CameraFeed({
             width={width}
             height={height}
             className="absolute top-0 left-0"
-            style={{ 
-              transform: 'translateZ(0)' // Force hardware acceleration
-            }}
           />
 
           {/* Placeholder when camera is off */}

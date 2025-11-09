@@ -44,9 +44,6 @@ export function Navigation() {
                     <Link href="/dashboard">
                       <Button variant="outline">Dashboard</Button>
                     </Link>
-                    <Link href="/settings">
-                      <Button variant="outline">Settings</Button>
-                    </Link>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {user.email}

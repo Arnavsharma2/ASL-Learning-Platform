@@ -47,13 +47,10 @@ class ONNXInference {
       }
       this.labels = await labelsResponse.json();
 
-      // Load ONNX model - try WebGL (GPU) first for best performance
+      // Load ONNX model
       this.session = await ort.InferenceSession.create('/models/model.onnx', {
-        executionProviders: ['webgl', 'wasm'], // Try GPU first, fallback to CPU
+        executionProviders: ['wasm'],
         graphOptimizationLevel: 'all',
-        executionMode: 'sequential',
-        enableCpuMemArena: true,
-        enableMemPattern: true,
       });
 
       console.log('✓ ONNX model loaded successfully');
