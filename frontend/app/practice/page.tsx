@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { MediaPipeResults } from '@/lib/mediapipe';
@@ -21,7 +21,7 @@ interface Lesson {
   image_url?: string;
 }
 
-export default function PracticePage() {
+function PracticePageContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -446,5 +446,19 @@ export default function PracticePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function PracticePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg">Loading practice mode...</p>
+        </div>
+      </div>
+    }>
+      <PracticePageContent />
+    </Suspense>
   );
 }
