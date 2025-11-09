@@ -16,7 +16,7 @@ CREATE POLICY "Allow backend to insert sessions"
 -- Keep read restrictions in place
 CREATE POLICY "Users can view their own sessions"
     ON practice_sessions FOR SELECT
-    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
+    USING (auth.uid() = user_id OR auth.uid() IS NULL);
 
 -- For user_progress: Allow all inserts and updates (backend will validate)
 CREATE POLICY "Allow backend to insert progress"
@@ -30,7 +30,7 @@ CREATE POLICY "Allow backend to update progress"
 -- Keep read restrictions
 CREATE POLICY "Users can view their own progress"
     ON user_progress FOR SELECT
-    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
+    USING (auth.uid() = user_id OR auth.uid() IS NULL);
 
 -- Verify the policies
 SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual, with_check

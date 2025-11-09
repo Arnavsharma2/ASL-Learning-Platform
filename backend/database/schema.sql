@@ -74,7 +74,7 @@ CREATE POLICY "Allow backend to insert sessions"
 
 CREATE POLICY "Users can view their own sessions"
     ON practice_sessions FOR SELECT
-    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
+    USING (auth.uid() = user_id OR auth.uid() IS NULL);
 
 -- User progress policies
 CREATE POLICY "Allow backend to insert progress"
@@ -87,7 +87,7 @@ CREATE POLICY "Allow backend to update progress"
 
 CREATE POLICY "Users can view their own progress"
     ON user_progress FOR SELECT
-    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
+    USING (auth.uid() = user_id OR auth.uid() IS NULL);
 
 -- Everyone can read lessons (public data)
 ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
