@@ -26,13 +26,17 @@ frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 origins = [
     "http://localhost:3000",  # Next.js dev server
     "http://127.0.0.1:3000",
+    "https://asl-learning-platform-psi.vercel.app",  # Production frontend
 ]
 
-# Add production frontend URL if not localhost
+# Add production frontend URL from env if not localhost and not already added
 if frontend_url and "localhost" not in frontend_url:
-    origins.append(frontend_url)
+    if frontend_url not in origins:
+        origins.append(frontend_url)
     # Also add without trailing slash if it has one
-    origins.append(frontend_url.rstrip("/"))
+    url_no_slash = frontend_url.rstrip("/")
+    if url_no_slash not in origins:
+        origins.append(url_no_slash)
 
 app.add_middleware(
     CORSMiddleware,
