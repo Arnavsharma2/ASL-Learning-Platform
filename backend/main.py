@@ -22,11 +22,17 @@ app = FastAPI(
 )
 
 # CORS configuration for frontend
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
 origins = [
     "http://localhost:3000",  # Next.js dev server
     "http://127.0.0.1:3000",
-    os.getenv("FRONTEND_URL", ""),
 ]
+
+# Add production frontend URL if not localhost
+if frontend_url and "localhost" not in frontend_url:
+    origins.append(frontend_url)
+    # Also add without trailing slash if it has one
+    origins.append(frontend_url.rstrip("/"))
 
 app.add_middleware(
     CORSMiddleware,
