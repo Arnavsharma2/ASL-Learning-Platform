@@ -71,92 +71,98 @@ export async function initializeHands(
 
 /**
  * Start camera stream and process frames
+ * Optimized for smooth performance using requestVideoFrameCallback when available
  */
 export async function startCamera(
   videoElement: HTMLVideoElement,
   hands: any,
 ): Promise<MediaStream> {
+  // Use lower resolution for better performance (can be increased if needed)
   const stream = await navigator.mediaDevices.getUserMedia({
-    video: { width: 640, height: 480 },
+    video: { 
+      width: { ideal: 640, max: 640 },
+      height: { ideal: 480, max: 480 },
+      frameRate: { ideal: 30, max: 30 },
+      facingMode: 'user'
+    },
   });
 
   videoElement.srcObject = stream;
+  videoElement.playsInline = true;
+  videoElement.muted = true;
   await videoElement.play();
 
-  // Throttle frame processing to ~30fps to reduce lag when hands enter/exit
-  let lastFrameTime = 0;
-  const targetFPS = 30;
-  const frameInterval = 1000 / targetFPS;
-  let isProcessing = false;
-  let animationFrameId: number | null = null;
   let shouldContinue = true;
+  let frameCallbackId: number | null = null;
+  let rafId: number | null = null;
 
-  // Process frames with throttling
+  // Use requestVideoFrameCallback if available (much more efficient for video)
+  // Falls back to requestAnimationFrame for compatibility
   const sendFrame = () => {
-    // Check if still active and video is playing
-    if (!videoElement.srcObject || !shouldContinue) {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
+    if (!videoElement.srcObject || !shouldContinue || videoElement.readyState < 2) {
       return;
     }
 
-    const now = performance.now();
-    const elapsed = now - lastFrameTime;
-
-    // Only process if enough time has passed and not already processing
-    if (elapsed >= frameInterval && !isProcessing) {
-      isProcessing = true;
-      lastFrameTime = now;
-      
-      // Process frame asynchronously
-      hands.send({ image: videoElement })
-        .catch((error: any) => {
-          console.error('Error sending frame to MediaPipe:', error);
-          // Stop processing on resource/loading errors to prevent infinite loop
-          const errorMsg = error?.message || error?.toString() || '';
-          if (
-            errorMsg.includes('resource') || 
-            errorMsg.includes('wasm') || 
-            errorMsg.includes('emscripten') ||
-            errorMsg.includes('not found') ||
-            errorMsg.includes('Failed to fetch')
-          ) {
-            console.error('MediaPipe resource error detected. Stopping frame processing.');
-            shouldContinue = false;
-            if (animationFrameId) {
-              cancelAnimationFrame(animationFrameId);
-              animationFrameId = null;
-            }
-            // Clear video source to stop the stream
-            if (videoElement.srcObject) {
-              const stream = videoElement.srcObject as MediaStream;
-              stream.getTracks().forEach(track => track.stop());
-              videoElement.srcObject = null;
-            }
-          }
-        })
-        .finally(() => {
-          isProcessing = false;
-        });
-    }
-
-    // Continue the loop - requestAnimationFrame naturally throttles to ~60fps
-    // Our frameInterval check ensures we only process at 30fps
-    if (shouldContinue) {
-      animationFrameId = requestAnimationFrame(sendFrame);
-    }
+    // Send frame to MediaPipe (non-blocking - MediaPipe handles queuing)
+    hands.send({ image: videoElement }).catch((error: any) => {
+      console.error('Error sending frame to MediaPipe:', error);
+      const errorMsg = error?.message || error?.toString() || '';
+      if (
+        errorMsg.includes('resource') || 
+        errorMsg.includes('wasm') || 
+        errorMsg.includes('emscripten') ||
+        errorMsg.includes('not found') ||
+        errorMsg.includes('Failed to fetch')
+      ) {
+        console.error('MediaPipe resource error detected. Stopping frame processing.');
+        shouldContinue = false;
+        if (videoElement.srcObject) {
+          const stream = videoElement.srcObject as MediaStream;
+          stream.getTracks().forEach(track => track.stop());
+          videoElement.srcObject = null;
+        }
+      }
+    });
   };
 
-  animationFrameId = requestAnimationFrame(sendFrame);
+  // Check if requestVideoFrameCallback is available (Chrome 94+, Edge 94+)
+  if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
+    const processFrame = (now: number, metadata: any) => {
+      if (!shouldContinue) return;
+      sendFrame();
+      frameCallbackId = (videoElement as any).requestVideoFrameCallback(processFrame);
+    };
+    frameCallbackId = (videoElement as any).requestVideoFrameCallback(processFrame);
+  } else {
+    // Fallback to requestAnimationFrame with throttling
+    let lastFrameTime = 0;
+    const targetFPS = 30;
+    const frameInterval = 1000 / targetFPS;
+
+    const rafLoop = () => {
+      if (!shouldContinue) return;
+
+      const now = performance.now();
+      if (now - lastFrameTime >= frameInterval) {
+        lastFrameTime = now;
+        sendFrame();
+      }
+
+      rafId = requestAnimationFrame(rafLoop);
+    };
+    rafId = requestAnimationFrame(rafLoop);
+  }
   
   // Store cleanup function on video element for later
   (videoElement as any).__stopFrameProcessing = () => {
     shouldContinue = false;
-    if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = null;
+    if (frameCallbackId !== null && 'cancelVideoFrameCallback' in HTMLVideoElement.prototype) {
+      (videoElement as any).cancelVideoFrameCallback(frameCallbackId);
+      frameCallbackId = null;
+    }
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
     }
   };
 
@@ -165,6 +171,7 @@ export async function startCamera(
 
 /**
  * Draw hand landmarks on canvas
+ * Optimized for performance with batched drawing operations
  */
 export function drawHands(
   canvasCtx: CanvasRenderingContext2D,
@@ -172,25 +179,31 @@ export function drawHands(
   width: number,
   height: number
 ) {
-  canvasCtx.save();
-  canvasCtx.clearRect(0, 0, width, height);
+  // Use requestAnimationFrame to decouple drawing from MediaPipe callback
+  // This prevents blocking MediaPipe processing
+  requestAnimationFrame(() => {
+    // Clear canvas efficiently
+    canvasCtx.clearRect(0, 0, width, height);
 
-  // Draw the video frame
-  if (results.image) {
-    canvasCtx.drawImage(results.image, 0, 0, width, height);
-  }
-
-  // Only draw landmarks if hands are detected
-  if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-    for (const landmarks of results.multiHandLandmarks) {
-      // Draw connections
-      drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS);
-      // Draw landmarks
-      drawLandmarks(canvasCtx, landmarks);
+    // Draw the video frame
+    if (results.image) {
+      canvasCtx.drawImage(results.image, 0, 0, width, height);
     }
-  }
 
-  canvasCtx.restore();
+    // Only draw landmarks if hands are detected
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      // Batch all drawing operations for better performance
+      canvasCtx.save();
+      
+      for (const landmarks of results.multiHandLandmarks) {
+        // Draw connections and landmarks together
+        drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS);
+        drawLandmarks(canvasCtx, landmarks);
+      }
+      
+      canvasCtx.restore();
+    }
+  });
 }
 
 // Hand connection lines (MediaPipe hand model)
@@ -203,32 +216,51 @@ const HAND_CONNECTIONS = [
   [5, 9], [9, 13], [13, 17],  // Palm
 ];
 
+/**
+ * Optimized connector drawing - batches all strokes
+ */
 function drawConnectors(
   ctx: CanvasRenderingContext2D,
   landmarks: any[],
   connections: number[][]
 ) {
+  const canvasWidth = ctx.canvas.width;
+  const canvasHeight = ctx.canvas.height;
+  
+  // Set style once for all strokes
   ctx.strokeStyle = '#00FF00';
   ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 
+  // Batch all strokes in a single path for better performance
+  ctx.beginPath();
   for (const [start, end] of connections) {
     const startLandmark = landmarks[start];
     const endLandmark = landmarks[end];
 
-    ctx.beginPath();
-    ctx.moveTo(startLandmark.x * ctx.canvas.width, startLandmark.y * ctx.canvas.height);
-    ctx.lineTo(endLandmark.x * ctx.canvas.width, endLandmark.y * ctx.canvas.height);
-    ctx.stroke();
+    ctx.moveTo(startLandmark.x * canvasWidth, startLandmark.y * canvasHeight);
+    ctx.lineTo(endLandmark.x * canvasWidth, endLandmark.y * canvasHeight);
   }
+  ctx.stroke();
 }
 
+/**
+ * Optimized landmark drawing - batches all circles
+ */
 function drawLandmarks(ctx: CanvasRenderingContext2D, landmarks: any[]) {
+  const canvasWidth = ctx.canvas.width;
+  const canvasHeight = ctx.canvas.height;
+  
+  // Set style once
+  ctx.fillStyle = '#FF0000';
+
+  // Batch all circles for better performance
   for (const landmark of landmarks) {
-    ctx.fillStyle = '#FF0000';
     ctx.beginPath();
     ctx.arc(
-      landmark.x * ctx.canvas.width,
-      landmark.y * ctx.canvas.height,
+      landmark.x * canvasWidth,
+      landmark.y * canvasHeight,
       5,
       0,
       2 * Math.PI
