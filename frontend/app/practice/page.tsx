@@ -94,14 +94,14 @@ function PracticePageContent() {
         return;
       }
 
-      // Throttle inference calls to max once per 300ms (3-4 FPS for better performance)
+      // Throttle inference to ~4 FPS for smooth performance
       const now = Date.now();
-      if (now - lastInferenceRef.current < 300 || isProcessingRef.current) {
-        return; // Skip this frame
+      if (now - lastInferenceRef.current < 250 || isProcessingRef.current) {
+        return; // Skip frame to keep video smooth
       }
 
-      isProcessingRef.current = true;
       lastInferenceRef.current = now;
+      isProcessingRef.current = true;
 
       try {
         // Extract landmarks from first detected hand

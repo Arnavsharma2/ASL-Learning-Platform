@@ -47,9 +47,9 @@ class ONNXInference {
       }
       this.labels = await labelsResponse.json();
 
-      // Load ONNX model with optimized settings for performance
+      // Load ONNX model - try WebGL (GPU) first for best performance
       this.session = await ort.InferenceSession.create('/models/model.onnx', {
-        executionProviders: ['wasm'],
+        executionProviders: ['webgl', 'wasm'], // Try GPU first, fallback to CPU
         graphOptimizationLevel: 'all',
         executionMode: 'sequential',
         enableCpuMemArena: true,
