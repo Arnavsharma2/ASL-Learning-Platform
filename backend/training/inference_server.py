@@ -85,10 +85,14 @@ async def startup_event():
 @app.get("/")
 async def root():
     """Health check endpoint"""
+    # Filter to only A-Z letters
+    alphabet_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    all_signs = list(labels['label_to_idx'].keys()) if labels else []
+    filtered_signs = [s for s in all_signs if s in alphabet_letters]
     return {
         "status": "running",
         "model_loaded": model is not None,
-        "signs": list(labels['label_to_idx'].keys()) if labels else []
+        "signs": filtered_signs
     }
 
 
@@ -133,18 +137,34 @@ async def predict(input_data: LandmarksInput):
             output = model(input_tensor)
             probabilities = torch.softmax(output, dim=1)
 
-            # Get prediction
-            confidence, predicted_idx = probabilities.max(1)
-            predicted_idx = predicted_idx.item()
-            confidence = confidence.item()
+            # Filter to only A-Z letters (ignore "del" and "space")
+            alphabet_letters = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            best_letter_idx = -1
+            best_letter_prob = -1.0
 
-            # Get sign name
-            sign = labels['idx_to_label'][predicted_idx]
+            probs_np = probabilities[0].cpu().numpy()
+            for i in range(len(labels['idx_to_label'])):
+                label = labels['idx_to_label'][i]
+                # Only consider A-Z letters
+                if label in alphabet_letters and probs_np[i] > best_letter_prob:
+                    best_letter_prob = probs_np[i]
+                    best_letter_idx = i
 
-            # Get all probabilities
+            # If no letter found (shouldn't happen), fall back to original prediction
+            if best_letter_idx == -1:
+                confidence, predicted_idx = probabilities.max(1)
+                predicted_idx = predicted_idx.item()
+                confidence = confidence.item()
+                sign = labels['idx_to_label'][predicted_idx]
+            else:
+                sign = labels['idx_to_label'][best_letter_idx]
+                confidence = float(best_letter_prob)
+
+            # Get all probabilities (only for A-Z letters)
             all_probs = {
                 labels['idx_to_label'][i]: float(probabilities[0][i])
                 for i in range(len(labels['idx_to_label']))
+                if labels['idx_to_label'][i] in alphabet_letters
             }
 
         return PredictionOutput(

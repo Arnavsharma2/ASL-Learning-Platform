@@ -438,7 +438,7 @@ function PracticePageContent() {
               <Card className="p-6 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
                 <p className="text-sm text-green-900 dark:text-green-100">
                   <strong>🚀 Client-Side AI:</strong> ONNX model running in your browser!
-                  Recognizing 28 signs: A-Z, space, del
+                  Recognizing alphabet letters A-Z
                 </p>
                 <p className="text-xs text-green-700 dark:text-green-300 mt-2">
                   Model: PyTorch MLP → ONNX | Test Accuracy: 98.98% | No server required!

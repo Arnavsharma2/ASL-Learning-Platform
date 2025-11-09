@@ -100,17 +100,36 @@ class ONNXInference {
     // Apply softmax to get probabilities
     const probabilities = this.softmax(Array.from(logits));
 
-    // Get predicted class
-    const predictedIdx = probabilities.indexOf(Math.max(...probabilities));
-    const predictedSign = this.labels.idx_to_label[predictedIdx.toString()];
-    const confidence = probabilities[predictedIdx];
+    // Filter to only A-Z letters (ignore "del" and "space")
+    const alphabetLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    let bestLetterIdx = -1;
+    let bestLetterProb = -1;
 
-    // Create probability map
-    const probabilityMap: { [key: string]: number } = {};
     for (let i = 0; i < probabilities.length; i++) {
       const label = this.labels.idx_to_label[i.toString()];
-      probabilityMap[label] = probabilities[i];
+      // Only consider A-Z letters
+      if (alphabetLetters.includes(label) && probabilities[i] > bestLetterProb) {
+        bestLetterProb = probabilities[i];
+        bestLetterIdx = i;
+      }
     }
+
+    // If no letter found (shouldn't happen), fall back to original prediction
+    if (bestLetterIdx === -1) {
+      const predictedIdx = probabilities.indexOf(Math.max(...probabilities));
+      const predictedSign = this.labels.idx_to_label[predictedIdx.toString()];
+      return {
+        sign: predictedSign,
+        confidence: probabilities[predictedIdx],
+        probabilities: this.createProbabilityMap(probabilities, alphabetLetters),
+      };
+    }
+
+    const predictedSign = this.labels.idx_to_label[bestLetterIdx.toString()];
+    const confidence = probabilities[bestLetterIdx];
+
+    // Create probability map (only for A-Z letters)
+    const probabilityMap = this.createProbabilityMap(probabilities, alphabetLetters);
 
     return {
       sign: predictedSign,
@@ -124,6 +143,18 @@ class ONNXInference {
     const expScores = logits.map(x => Math.exp(x - maxLogit));
     const sumExpScores = expScores.reduce((a, b) => a + b, 0);
     return expScores.map(x => x / sumExpScores);
+  }
+
+  private createProbabilityMap(probabilities: number[], allowedLetters: string[]): { [key: string]: number } {
+    const probabilityMap: { [key: string]: number } = {};
+    for (let i = 0; i < probabilities.length; i++) {
+      const label = this.labels!.idx_to_label[i.toString()];
+      // Only include A-Z letters in the probability map
+      if (allowedLetters.includes(label)) {
+        probabilityMap[label] = probabilities[i];
+      }
+    }
+    return probabilityMap;
   }
 
   isModelLoaded(): boolean {
