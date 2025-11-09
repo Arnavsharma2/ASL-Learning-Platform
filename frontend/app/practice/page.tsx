@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { MediaPipeResults } from '@/lib/mediapipe';
+import { MediaPipeResults, HandLandmarks } from '@/lib/mediapipe';
 import { CameraFeed } from '@/components/CameraFeed';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
@@ -105,7 +105,7 @@ function PracticePageContent() {
         const landmarks = results.multiHandLandmarks[0];
 
         // Convert landmarks to array of [x, y, z] coordinates
-        const landmarksArray = landmarks.map((lm: any) => [lm.x, lm.y, lm.z]);
+        const landmarksArray = (landmarks as HandLandmarks[]).map((lm: HandLandmarks) => [lm.x, lm.y, lm.z]);
 
         // Run ONNX inference directly in browser
         const prediction = await onnxInference.predict(landmarksArray);
