@@ -4,12 +4,12 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { MediaPipeResults, HandLandmarks } from '@/lib/mediapipe';
-import { CameraFeed } from '@/components/CameraFeed';
+import { AdaptiveCameraFeed } from '@/components/AdaptiveCameraFeed';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { progressApi, lessonsApi } from '@/lib/api';
+import { progressApi, lessonsApi, settingsApi } from '@/lib/api';
 import onnxInference from '@/lib/onnx-inference';
 import { CheckCircle2, XCircle, Target } from 'lucide-react';
 
@@ -38,6 +38,8 @@ function PracticePageContent() {
   const isProcessingRef = useRef<boolean>(false);
   const [modelLoading, setModelLoading] = useState(true);
   const [modelError, setModelError] = useState<string | null>(null);
+  const [userSettings, setUserSettings] = useState<any>(null);
+  const [settingsLoading, setSettingsLoading] = useState(true);
 
   // Guided practice state
   const [correctAttempts, setCorrectAttempts] = useState(0);
@@ -65,6 +67,26 @@ function PracticePageContent() {
     }
     loadLesson();
   }, [lessonId]);
+
+  // Load user settings
+  useEffect(() => {
+    async function loadSettings() {
+      if (!user) {
+        setSettingsLoading(false);
+        return;
+      }
+      try {
+        const settings = await settingsApi.getUserSettings(user.id);
+        setUserSettings(settings);
+      } catch (error) {
+        console.warn('Failed to load settings, using defaults:', error);
+        setUserSettings(null);
+      } finally {
+        setSettingsLoading(false);
+      }
+    }
+    loadSettings();
+  }, [user]);
 
   // Load ONNX model on component mount (optional - practice works without it)
   useEffect(() => {
@@ -94,9 +116,10 @@ function PracticePageContent() {
         return;
       }
 
-      // Throttle inference to ~4 FPS for smooth performance
+      // Throttle inference based on user settings
+      const throttleMs = userSettings?.inference_throttle_ms ?? 250;
       const now = Date.now();
-      if (now - lastInferenceRef.current < 250 || isProcessingRef.current) {
+      if (now - lastInferenceRef.current < throttleMs || isProcessingRef.current) {
         return; // Skip frame to keep video smooth
       }
 
@@ -119,7 +142,8 @@ function PracticePageContent() {
         setConfidence(conf);
 
         // Check if this is guided practice and evaluate
-        if (targetSign && sign && conf >= MIN_CONFIDENCE && !completed) {
+        const minConfidence = userSettings?.min_confidence ?? MIN_CONFIDENCE;
+        if (targetSign && sign && conf >= minConfidence && !completed) {
           const isCorrect = sign === targetSign;
 
           setTotalAttempts(prev => prev + 1);
@@ -282,10 +306,17 @@ function PracticePageContent() {
                 </Card>
               ) : (
                 <>
-                  <CameraFeed
+                  <AdaptiveCameraFeed
                     onHandDetected={handleHandDetection}
                     width={640}
                     height={480}
+                    useServerProcessing={userSettings?.use_server_processing === true || userSettings?.use_server_processing === 1}
+                    settings={userSettings ? {
+                      video_resolution: userSettings.video_resolution,
+                      frame_rate: userSettings.frame_rate,
+                      model_complexity: userSettings.model_complexity,
+                      inference_throttle_ms: userSettings.inference_throttle_ms
+                    } : undefined}
                   />
                   {/* Real-time Feedback Overlay */}
                   {showFeedback && targetSign && (

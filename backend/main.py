@@ -9,7 +9,7 @@ load_dotenv()
 
 # Import routes (will show warnings if DB not configured, but won't crash)
 try:
-    from routes import lessons, progress
+    from routes import lessons, progress, settings, hand_tracking
     routes_available = True
 except Exception as e:
     print(f"Warning: Could not load routes: {e}")
@@ -62,6 +62,8 @@ app.add_middleware(
 if routes_available:
     app.include_router(lessons.router, prefix="/api/lessons", tags=["lessons"])
     app.include_router(progress.router, prefix="/api/progress", tags=["progress"])
+    app.include_router(settings.router, prefix="/api/settings", tags=["settings"])
+    app.include_router(hand_tracking.router, prefix="/api/hand-tracking", tags=["hand-tracking"])
 
 
 @app.get("/")

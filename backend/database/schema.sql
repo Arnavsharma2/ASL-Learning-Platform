@@ -39,12 +39,28 @@ CREATE TABLE IF NOT EXISTS practice_sessions (
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- User settings table
+CREATE TABLE IF NOT EXISTS user_settings (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL UNIQUE,
+    performance_mode VARCHAR(50) DEFAULT 'balanced', -- 'max_performance', 'balanced', 'max_accuracy'
+    video_resolution VARCHAR(20) DEFAULT '640x480', -- '480x360', '640x480', '1280x720'
+    frame_rate INTEGER DEFAULT 30, -- 15, 24, 30
+    model_complexity INTEGER DEFAULT 0, -- 0 (fastest), 1 (balanced), 2 (most accurate)
+    inference_throttle_ms INTEGER DEFAULT 250, -- Milliseconds between inferences
+    min_confidence FLOAT DEFAULT 0.8, -- Minimum confidence threshold
+    use_server_processing BOOLEAN DEFAULT false, -- Use server-side processing
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_user_progress_user_id ON user_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_lesson_id ON user_progress(lesson_id);
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_user_id ON practice_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_timestamp ON practice_sessions(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_lessons_category ON lessons(category);
+CREATE INDEX IF NOT EXISTS idx_user_settings_user_id ON user_settings(user_id);
 
 -- Insert sample lessons (ASL alphabet)
 INSERT INTO lessons (title, description, category, difficulty, sign_name) VALUES
@@ -87,6 +103,21 @@ CREATE POLICY "Allow backend to update progress"
 
 CREATE POLICY "Users can view their own progress"
     ON user_progress FOR SELECT
+    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
+
+-- User settings policies
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow backend to insert settings"
+    ON user_settings FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Allow backend to update settings"
+    ON user_settings FOR UPDATE
+    USING (true);
+
+CREATE POLICY "Users can view their own settings"
+    ON user_settings FOR SELECT
     USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
 
 -- Everyone can read lessons (public data)

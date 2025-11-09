@@ -90,5 +90,32 @@ export const progressApi = {
     apiRequest<any>(`/api/progress/stats/${userId}`),
 };
 
+// Settings API
+export const settingsApi = {
+  getUserSettings: (userId: string) =>
+    apiRequest<any>(`/api/settings/user/${userId}`),
+
+  createSettings: (settings: any) =>
+    apiRequest<any>('/api/settings/', {
+      method: 'POST',
+      body: JSON.stringify(settings),
+    }),
+
+  updateSettings: (userId: string, settings: any) =>
+    apiRequest<any>(`/api/settings/user/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    }),
+};
+
+// Hand Tracking API (server-side)
+export const handTrackingApi = {
+  processFrame: (frameData: { image_data: string; width?: number; height?: number }) =>
+    apiRequest<any>('/api/hand-tracking/process-frame', {
+      method: 'POST',
+      body: JSON.stringify(frameData),
+    }),
+};
+
 // Health check
 export const healthCheck = () => apiRequest<any>('/health');

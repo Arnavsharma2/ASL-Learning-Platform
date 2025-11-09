@@ -50,6 +50,23 @@ class PracticeSession(Base):
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
 
+class UserSettings(Base):
+    """User settings and preferences"""
+    __tablename__ = "user_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, nullable=False, unique=True, index=True)
+    performance_mode = Column(String, default='balanced')  # 'max_performance', 'balanced', 'max_accuracy'
+    video_resolution = Column(String, default='640x480')  # '480x360', '640x480', '1280x720'
+    frame_rate = Column(Integer, default=30)  # 15, 24, 30
+    model_complexity = Column(Integer, default=0)  # 0 (fastest), 1 (balanced), 2 (most accurate)
+    inference_throttle_ms = Column(Integer, default=250)  # Milliseconds between inferences
+    min_confidence = Column(Float, default=0.8)  # Minimum confidence threshold
+    use_server_processing = Column(Integer, default=0)  # 0 = false, 1 = true
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 # Pydantic Schemas for API
 
 class LessonBase(BaseModel):
@@ -116,6 +133,38 @@ class PracticeSessionResponse(BaseModel):
     confidence: float
     is_correct: Optional[int] = None  # 0, 1, or None
     timestamp: datetime
+
+    @field_validator('user_id', mode='before')
+    @classmethod
+    def convert_user_id_to_string(cls, v):
+        """Convert UUID to string if needed"""
+        if isinstance(v, UUID):
+            return str(v)
+        return str(v) if v is not None else v
+
+    class Config:
+        from_attributes = True
+
+
+class UserSettingsBase(BaseModel):
+    performance_mode: Optional[str] = 'balanced'
+    video_resolution: Optional[str] = '640x480'
+    frame_rate: Optional[int] = 30
+    model_complexity: Optional[int] = 0
+    inference_throttle_ms: Optional[int] = 250
+    min_confidence: Optional[float] = 0.8
+    use_server_processing: Optional[bool] = False
+
+
+class UserSettingsCreate(UserSettingsBase):
+    user_id: str
+
+
+class UserSettingsResponse(UserSettingsBase):
+    id: int
+    user_id: str
+    created_at: datetime
+    updated_at: datetime
 
     @field_validator('user_id', mode='before')
     @classmethod
