@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/contexts/AuthContext';
 import { settingsApi } from '@/lib/api';
 import { Navigation } from '@/components/Navigation';
 import { Card } from '@/components/ui/card';
