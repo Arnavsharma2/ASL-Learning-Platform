@@ -38,12 +38,16 @@ if frontend_url and "localhost" not in frontend_url:
     if url_no_slash not in origins:
         origins.append(url_no_slash)
 
+# Log allowed origins for debugging (remove in production if sensitive)
+print(f"CORS: Allowing origins: {origins}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Include routers (only if successfully loaded)
