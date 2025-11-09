@@ -66,7 +66,7 @@ function PracticePageContent() {
     loadLesson();
   }, [lessonId]);
 
-  // Load ONNX model on component mount
+  // Load ONNX model on component mount (optional - practice works without it)
   useEffect(() => {
     async function loadModel() {
       try {
@@ -75,8 +75,8 @@ function PracticePageContent() {
         await onnxInference.loadModel();
         console.log('ONNX model loaded successfully');
       } catch (error) {
-        console.error('Failed to load model:', error);
-        setModelError('Failed to load AI model. Please refresh the page.');
+        console.warn('ONNX model not available - using MediaPipe only mode:', error);
+        setModelError('AI model not loaded. Using basic hand tracking mode.');
       } finally {
         setModelLoading(false);
       }
@@ -86,8 +86,11 @@ function PracticePageContent() {
 
   const handleHandDetection = async (results: MediaPipeResults) => {
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-      // Skip if model is not loaded yet
+      // Skip if model is not loaded - show hand tracking only
       if (!onnxInference.isModelLoaded()) {
+        // Just show that hand is detected, don't try to predict
+        setDetectedSign('Hand detected (model not loaded)');
+        setConfidence(0);
         return;
       }
 
