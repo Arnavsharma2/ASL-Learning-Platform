@@ -17,6 +17,7 @@ Run migration files in order if you need to update an existing database:
 
 1. `migration_fix_is_correct.sql` - Fixes the `is_correct` constraint to allow NULL values for free practice mode
 2. `migration_fix_rls_policies.sql` - Fixes RLS policies to allow backend API inserts (backend uses PostgreSQL connection, not Supabase auth)
+3. `migration_remove_fk_constraints.sql` - Removes foreign key constraints on user_id and changes type to VARCHAR (required for backend inserts)
 
 ## Schema Changes
 

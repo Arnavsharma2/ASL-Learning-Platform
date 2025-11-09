@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS lessons (
 -- User progress table
 CREATE TABLE IF NOT EXISTS user_progress (
     id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id VARCHAR(255) NOT NULL,
     lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
     attempts INTEGER DEFAULT 0,
     accuracy FLOAT,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS user_progress (
 -- Practice sessions table
 CREATE TABLE IF NOT EXISTS practice_sessions (
     id SERIAL PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id VARCHAR(255) NOT NULL,
     sign_detected VARCHAR(100),
     confidence FLOAT,
     is_correct INTEGER CHECK (is_correct IN (0, 1) OR is_correct IS NULL),
@@ -74,7 +74,7 @@ CREATE POLICY "Allow backend to insert sessions"
 
 CREATE POLICY "Users can view their own sessions"
     ON practice_sessions FOR SELECT
-    USING (auth.uid() = user_id OR auth.uid() IS NULL);
+    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
 
 -- User progress policies
 CREATE POLICY "Allow backend to insert progress"
@@ -87,7 +87,7 @@ CREATE POLICY "Allow backend to update progress"
 
 CREATE POLICY "Users can view their own progress"
     ON user_progress FOR SELECT
-    USING (auth.uid() = user_id OR auth.uid() IS NULL);
+    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
 
 -- Everyone can read lessons (public data)
 ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
