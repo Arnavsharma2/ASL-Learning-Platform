@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 import os
 
 # Load environment variables
@@ -29,14 +30,21 @@ origins = [
     "https://asl-learning-platform-psi.vercel.app",  # Production frontend
 ]
 
+# Extract origin from FRONTEND_URL (strip any path, query, or fragment)
+# CORS only cares about scheme + host + port, not the path
+def extract_origin(url: str) -> str:
+    """Extract origin (scheme + host + port) from a full URL, ignoring path."""
+    parsed = urlparse(url)
+    # Reconstruct origin: scheme://host:port
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    return origin.rstrip("/")
+
 # Add production frontend URL from env if not localhost and not already added
 if frontend_url and "localhost" not in frontend_url:
-    if frontend_url not in origins:
-        origins.append(frontend_url)
-    # Also add without trailing slash if it has one
-    url_no_slash = frontend_url.rstrip("/")
-    if url_no_slash not in origins:
-        origins.append(url_no_slash)
+    # Extract just the origin (no path)
+    frontend_origin = extract_origin(frontend_url)
+    if frontend_origin not in origins:
+        origins.append(frontend_origin)
 
 # Log allowed origins for debugging (remove in production if sensitive)
 print(f"CORS: Allowing origins: {origins}")
