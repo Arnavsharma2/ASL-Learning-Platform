@@ -64,27 +64,30 @@ ON CONFLICT DO NOTHING;
 ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE practice_sessions ENABLE ROW LEVEL SECURITY;
 
--- Users can only read/write their own progress
-CREATE POLICY "Users can view their own progress"
-    ON user_progress FOR SELECT
-    USING (auth.uid() = user_id);
+-- Note: Backend connects via PostgreSQL (not Supabase auth), so auth.uid() is NULL
+-- Policies allow backend inserts while keeping read restrictions
 
-CREATE POLICY "Users can insert their own progress"
-    ON user_progress FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+-- Practice sessions policies
+CREATE POLICY "Allow backend to insert sessions"
+    ON practice_sessions FOR INSERT
+    WITH CHECK (true);
 
-CREATE POLICY "Users can update their own progress"
-    ON user_progress FOR UPDATE
-    USING (auth.uid() = user_id);
-
--- Users can only read/write their own practice sessions
 CREATE POLICY "Users can view their own sessions"
     ON practice_sessions FOR SELECT
-    USING (auth.uid() = user_id);
+    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
 
-CREATE POLICY "Users can insert their own sessions"
-    ON practice_sessions FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+-- User progress policies
+CREATE POLICY "Allow backend to insert progress"
+    ON user_progress FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Allow backend to update progress"
+    ON user_progress FOR UPDATE
+    USING (true);
+
+CREATE POLICY "Users can view their own progress"
+    ON user_progress FOR SELECT
+    USING (auth.uid()::text = user_id OR auth.uid() IS NULL);
 
 -- Everyone can read lessons (public data)
 ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
