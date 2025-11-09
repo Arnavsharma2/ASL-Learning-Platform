@@ -33,6 +33,7 @@ class UserProgress(Base):
     lesson_id = Column(Integer, ForeignKey("lessons.id"))
     attempts = Column(Integer, default=0)
     accuracy = Column(Float)  # Average accuracy percentage
+    status = Column(String, default='not_started')  # not_started, in_progress, mastered
     last_practiced = Column(DateTime(timezone=True), server_default=func.now())
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -75,6 +76,7 @@ class UserProgressBase(BaseModel):
     lesson_id: int
     attempts: int = 0
     accuracy: Optional[float] = None
+    status: Optional[str] = 'not_started'
 
 
 class UserProgressCreate(UserProgressBase):
@@ -84,6 +86,7 @@ class UserProgressCreate(UserProgressBase):
 class UserProgressResponse(UserProgressBase):
     id: int
     user_id: str
+    status: str
     last_practiced: datetime
     created_at: datetime
 

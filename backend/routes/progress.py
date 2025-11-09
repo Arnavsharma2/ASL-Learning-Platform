@@ -39,6 +39,8 @@ async def create_or_update_progress(
         # Update existing progress
         existing.attempts = progress.attempts
         existing.accuracy = progress.accuracy
+        if progress.status:
+            existing.status = progress.status
         existing.last_practiced = func.now()
         db.commit()
         db.refresh(existing)
