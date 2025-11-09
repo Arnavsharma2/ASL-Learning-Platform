@@ -37,7 +37,7 @@ export default function DataCollectionPage() {
       const landmarks = results.multiHandLandmarks[0];
 
       // Flatten landmarks to array of [x, y, z] coordinates
-      const flatLandmarks = landmarks.map(lm => [lm.x, lm.y, lm.z]);
+      const flatLandmarks = landmarks.map((lm: { x: number; y: number; z: number }) => [lm.x, lm.y, lm.z]);
 
       const sample: LandmarkSample = {
         sign: selectedSign,
