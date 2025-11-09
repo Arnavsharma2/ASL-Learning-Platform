@@ -94,9 +94,9 @@ function PracticePageContent() {
         return;
       }
 
-      // Throttle inference calls to max once per 200ms to prevent performance issues
+      // Throttle inference calls to max once per 300ms (3-4 FPS for better performance)
       const now = Date.now();
-      if (now - lastInferenceRef.current < 200 || isProcessingRef.current) {
+      if (now - lastInferenceRef.current < 300 || isProcessingRef.current) {
         return; // Skip this frame
       }
 

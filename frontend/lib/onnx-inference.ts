@@ -47,10 +47,13 @@ class ONNXInference {
       }
       this.labels = await labelsResponse.json();
 
-      // Load ONNX model
+      // Load ONNX model with optimized settings for performance
       this.session = await ort.InferenceSession.create('/models/model.onnx', {
         executionProviders: ['wasm'],
         graphOptimizationLevel: 'all',
+        executionMode: 'sequential',
+        enableCpuMemArena: true,
+        enableMemPattern: true,
       });
 
       console.log('✓ ONNX model loaded successfully');
