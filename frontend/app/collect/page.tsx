@@ -5,7 +5,7 @@ import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CameraFeed } from '@/components/CameraFeed';
-import { MediaPipeResults } from '@/lib/mediapipe';
+import { MediaPipeResults, HandLandmarks } from '@/lib/mediapipe';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
@@ -37,7 +37,7 @@ export default function DataCollectionPage() {
       const landmarks = results.multiHandLandmarks[0];
 
       // Flatten landmarks to array of [x, y, z] coordinates
-      const flatLandmarks = landmarks.map((lm: { x: number; y: number; z: number }) => [lm.x, lm.y, lm.z]);
+      const flatLandmarks = (landmarks as HandLandmarks[]).map((lm: HandLandmarks) => [lm.x, lm.y, lm.z]);
 
       const sample: LandmarkSample = {
         sign: selectedSign,
