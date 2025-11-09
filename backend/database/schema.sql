@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
     model_complexity INTEGER DEFAULT 0, -- 0 (fastest), 1 (balanced), 2 (most accurate)
     inference_throttle_ms INTEGER DEFAULT 250, -- Milliseconds between inferences
     min_confidence FLOAT DEFAULT 0.8, -- Minimum confidence threshold
-    use_server_processing BOOLEAN DEFAULT false, -- Use server-side processing
+    use_server_processing INTEGER DEFAULT 0, -- Use server-side processing (0 = false, 1 = true)
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -82,6 +82,18 @@ ALTER TABLE practice_sessions ENABLE ROW LEVEL SECURITY;
 
 -- Note: Backend connects via PostgreSQL (not Supabase auth), so auth.uid() is NULL
 -- Policies allow backend inserts while keeping read restrictions
+
+-- Drop existing policies if they exist (to allow re-running this script)
+DROP POLICY IF EXISTS "Allow backend to insert sessions" ON practice_sessions;
+DROP POLICY IF EXISTS "Users can view their own sessions" ON practice_sessions;
+DROP POLICY IF EXISTS "Allow backend to insert progress" ON user_progress;
+DROP POLICY IF EXISTS "Allow backend to update progress" ON user_progress;
+DROP POLICY IF EXISTS "Users can view their own progress" ON user_progress;
+DROP POLICY IF EXISTS "Allow backend to insert settings" ON user_settings;
+DROP POLICY IF EXISTS "Allow backend to update settings" ON user_settings;
+DROP POLICY IF EXISTS "Users can view their own settings" ON user_settings;
+DROP POLICY IF EXISTS "Anyone can view lessons" ON lessons;
+DROP POLICY IF EXISTS "Authenticated users can create lessons" ON lessons;
 
 -- Practice sessions policies
 CREATE POLICY "Allow backend to insert sessions"

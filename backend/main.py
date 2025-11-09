@@ -8,13 +8,36 @@ import os
 load_dotenv()
 
 # Import routes (will show warnings if DB not configured, but won't crash)
+routes_available = False
+lessons_router = None
+progress_router = None
+settings_router = None
+hand_tracking_router = None
+
 try:
-    from routes import lessons, progress, settings, hand_tracking
+    from routes import lessons, progress
+    lessons_router = lessons.router
+    progress_router = progress.router
     routes_available = True
+    print("✓ Loaded lessons and progress routes")
 except Exception as e:
-    print(f"Warning: Could not load routes: {e}")
+    print(f"Warning: Could not load lessons/progress routes: {e}")
     print("API will run in limited mode. Configure Supabase to enable all endpoints.")
-    routes_available = False
+
+# Try to load optional routes (settings, hand_tracking)
+try:
+    from routes import settings
+    settings_router = settings.router
+    print("✓ Loaded settings routes")
+except Exception as e:
+    print(f"Warning: Could not load settings routes: {e}")
+
+try:
+    from routes import hand_tracking
+    hand_tracking_router = hand_tracking.router
+    print("✓ Loaded hand_tracking routes")
+except Exception as e:
+    print(f"Warning: Could not load hand_tracking routes: {e}")
 
 app = FastAPI(
     title="ASL Learning API",
@@ -59,11 +82,15 @@ app.add_middleware(
 )
 
 # Include routers (only if successfully loaded)
-if routes_available:
-    app.include_router(lessons.router, prefix="/api/lessons", tags=["lessons"])
-    app.include_router(progress.router, prefix="/api/progress", tags=["progress"])
-    app.include_router(settings.router, prefix="/api/settings", tags=["settings"])
-    app.include_router(hand_tracking.router, prefix="/api/hand-tracking", tags=["hand-tracking"])
+if routes_available and lessons_router and progress_router:
+    app.include_router(lessons_router, prefix="/api/lessons", tags=["lessons"])
+    app.include_router(progress_router, prefix="/api/progress", tags=["progress"])
+
+if settings_router:
+    app.include_router(settings_router, prefix="/api/settings", tags=["settings"])
+
+if hand_tracking_router:
+    app.include_router(hand_tracking_router, prefix="/api/hand-tracking", tags=["hand-tracking"])
 
 
 @app.get("/")
