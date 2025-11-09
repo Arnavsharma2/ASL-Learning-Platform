@@ -34,6 +34,15 @@ Deploy your ASL Learning Platform for **FREE** using:
 2. Copy the contents of `backend/database/schema.sql`
 3. Paste into SQL Editor and click **Run**
 
+### 1.2.1 Run Database Migration (If Already Deployed)
+
+If you already ran the schema earlier and need to update it:
+
+1. In Supabase dashboard, go to **SQL Editor**
+2. Copy the contents of `backend/database/migration_fix_is_correct.sql`
+3. Paste into SQL Editor and click **Run**
+4. This will fix the `is_correct` constraint to allow NULL values (needed for free practice mode)
+
 ### 1.3 Get Your Credentials
 
 Go to **Settings** → **API** and copy:

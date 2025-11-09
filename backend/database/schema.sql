@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS user_progress (
     lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
     attempts INTEGER DEFAULT 0,
     accuracy FLOAT,
+    status VARCHAR(50) DEFAULT 'not_started',
     last_practiced TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(user_id, lesson_id)
@@ -34,7 +35,7 @@ CREATE TABLE IF NOT EXISTS practice_sessions (
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     sign_detected VARCHAR(100),
     confidence FLOAT,
-    is_correct INTEGER CHECK (is_correct IN (0, 1)),
+    is_correct INTEGER CHECK (is_correct IN (0, 1) OR is_correct IS NULL),
     timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
