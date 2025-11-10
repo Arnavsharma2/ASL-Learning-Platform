@@ -154,14 +154,23 @@ export default function Home() {
                     <span className="text-xs text-gray-400">Tailwind</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">MP</span>
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                        <circle cx="9" cy="12" r="1.5" fill="white"/>
+                        <circle cx="15" cy="12" r="1.5" fill="white"/>
+                        <path d="M8 16h8" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                      </svg>
                     </div>
                     <span className="text-xs text-gray-400">MediaPipe</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-orange-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">ONNX</span>
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="white"/>
+                        <path d="M9 9h6M9 15h6M9 12h6" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                        <circle cx="18" cy="6" r="2" fill="white"/>
+                      </svg>
                     </div>
                     <span className="text-xs text-gray-400">ONNX Runtime</span>
                   </div>
@@ -259,7 +268,7 @@ export default function Home() {
                           stroke="#9CA3AF"
                           tick={{ fill: '#9CA3AF', fontSize: 11 }}
                           label={{ 
-                            value: 'Training Loss', 
+                            value: 'Loss', 
                             angle: -90, 
                             position: 'insideLeft', 
                             offset: 10,
@@ -330,7 +339,7 @@ export default function Home() {
                           tick={{ fill: '#9CA3AF', fontSize: 11 }}
                           domain={[90, 100]}
                           label={{ 
-                            value: 'Validation Accuracy (%)', 
+                            value: 'Accuracy (%)', 
                             angle: -90, 
                             position: 'insideLeft', 
                             offset: 10,
@@ -382,370 +391,6 @@ export default function Home() {
                 </div>
               );
             })()}
-          </motion.section>
-
-          {/* High-Level Flowchart Section */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="mb-32"
-          >
-            <h2 className="text-4xl md:text-5xl font-light text-center mb-16">
-              High-Level Architecture Flowchart
-            </h2>
-            
-            <div className="max-w-6xl mx-auto">
-              <Card className="p-8 bg-gray-900 border-gray-800">
-                <div className="relative" style={{ minHeight: '800px' }}>
-                  {/* Data Extraction */}
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg px-6 py-4 shadow-lg border-2 border-purple-500">
-                      <h3 className="text-lg font-semibold text-white text-center">Data Extraction from<br/>Kaggle ASL Alphabet Dataset</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow Down to Database */}
-                  <div className="absolute top-24 left-1/2 transform -translate-x-1/2">
-                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* Database */}
-                  <div className="absolute top-36 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-lg px-6 py-4 shadow-lg border-2 border-indigo-500" style={{ width: '200px' }}>
-                      <h3 className="text-lg font-semibold text-white text-center">Database<br/>(Processed Data Storage)</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow Down from Database */}
-                  <div className="absolute top-56 left-1/2 transform -translate-x-1/2">
-                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* Split Point - Three paths */}
-                  <div className="absolute top-68 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-500 rounded-full"></div>
-
-                  {/* Left Branch: Data Processing */}
-                  <div className="absolute top-72 left-1/4 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 rounded-lg px-5 py-3 shadow-lg border-2 border-cyan-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Process and Clean Dataset</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow from Database to Process */}
-                  <svg className="absolute top-68 left-1/2" style={{ width: '200px', height: '80px', transform: 'translateX(-50%)' }}>
-                    <defs>
-                      <marker id="arrowhead-left" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                        <polygon points="0 0, 10 3, 0 6" fill="#6B7280" />
-                      </marker>
-                    </defs>
-                    <line x1="0" y1="0" x2="-100" y2="40" stroke="#6B7280" strokeWidth="2" markerEnd="url(#arrowhead-left)" />
-                  </svg>
-
-                  {/* Convert to Landmarks */}
-                  <div className="absolute top-96 left-1/4 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 rounded-lg px-5 py-3 shadow-lg border-2 border-cyan-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Convert Images to<br/>MediaPipe Hand Landmarks</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow Down from Convert */}
-                  <div className="absolute top-120 left-1/4 transform -translate-x-1/2">
-                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* Arrow back to Database (curved) */}
-                  <svg className="absolute top-132 left-1/4" style={{ width: '150px', height: '100px', transform: 'translateX(-50%)' }}>
-                    <defs>
-                      <marker id="arrowhead-back-left" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                        <polygon points="0 0, 10 3, 0 6" fill="#6B7280" />
-                      </marker>
-                    </defs>
-                    <path d="M 0 40 Q -50 0 -100 -40" stroke="#6B7280" strokeWidth="2" fill="none" markerEnd="url(#arrowhead-back-left)" />
-                  </svg>
-
-                  {/* Right Branch: Model Training */}
-                  <div className="absolute top-72 right-1/4 transform translate-x-1/2">
-                    <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-lg px-5 py-3 shadow-lg border-2 border-orange-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Extract Features<br/>and Labels</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow from Database to Extract */}
-                  <svg className="absolute top-68 right-1/2" style={{ width: '200px', height: '80px', transform: 'translateX(50%)' }}>
-                    <defs>
-                      <marker id="arrowhead-right" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                        <polygon points="0 0, 10 3, 0 6" fill="#6B7280" />
-                      </marker>
-                    </defs>
-                    <line x1="0" y1="0" x2="100" y2="40" stroke="#6B7280" strokeWidth="2" markerEnd="url(#arrowhead-right)" />
-                  </svg>
-
-                  {/* Split Data */}
-                  <div className="absolute top-96 right-1/4 transform translate-x-1/2">
-                    <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-lg px-5 py-3 shadow-lg border-2 border-orange-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Split Data:<br/>80% Training, 20% Validation</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow Down */}
-                  <div className="absolute top-120 right-1/4 transform translate-x-1/2">
-                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* Train Model */}
-                  <div className="absolute top-132 right-1/4 transform translate-x-1/2">
-                    <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-lg px-5 py-3 shadow-lg border-2 border-red-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Train PyTorch MLP<br/>Neural Network</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow Down */}
-                  <div className="absolute top-156 right-1/4 transform translate-x-1/2">
-                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* Test Accuracy */}
-                  <div className="absolute top-168 right-1/4 transform translate-x-1/2">
-                    <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-lg px-5 py-3 shadow-lg border-2 border-red-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Test Accuracy on<br/>Validation Data</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow back to Train (curved) */}
-                  <svg className="absolute top-180 right-1/4" style={{ width: '150px', height: '100px', transform: 'translateX(50%)' }}>
-                    <defs>
-                      <marker id="arrowhead-back-right" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                        <polygon points="0 0, 10 3, 0 6" fill="#6B7280" />
-                      </marker>
-                    </defs>
-                    <path d="M 0 40 Q 50 0 100 -40" stroke="#6B7280" strokeWidth="2" fill="none" markerEnd="url(#arrowhead-back-right)" />
-                  </svg>
-
-                  {/* Center Path: Export to ONNX */}
-                  <div className="absolute top-72 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-lg px-5 py-3 shadow-lg border-2 border-green-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Export Model<br/>to ONNX Format</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow Down */}
-                  <div className="absolute top-96 left-1/2 transform -translate-x-1/2">
-                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* FastAPI Implementation */}
-                  <div className="absolute top-108 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-lg px-5 py-3 shadow-lg border-2 border-green-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Implement ONNX Model<br/>in FastAPI Backend</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow Down */}
-                  <div className="absolute top-132 left-1/2 transform -translate-x-1/2">
-                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* Frontend Integration */}
-                  <div className="absolute top-144 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg px-5 py-3 shadow-lg border-2 border-blue-500" style={{ width: '220px' }}>
-                      <h3 className="text-base font-semibold text-white text-center">Call FastAPI from<br/>Next.js Frontend</h3>
-                    </div>
-                  </div>
-
-                  {/* Arrow Down */}
-                  <div className="absolute top-168 left-1/2 transform -translate-x-1/2">
-                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* Final: Real-time Recognition */}
-                  <div className="absolute top-180 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg px-6 py-4 shadow-lg border-2 border-purple-500" style={{ width: '240px' }}>
-                      <h3 className="text-lg font-semibold text-white text-center">Real-time ASL Recognition<br/>in Browser</h3>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </motion.section>
-
-          {/* Backend Architecture Flowchart */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.0 }}
-            className="mb-32"
-          >
-            <h2 className="text-4xl md:text-5xl font-light text-center mb-16">
-              Backend Architecture
-            </h2>
-            
-            <div className="max-w-6xl mx-auto">
-              <Card className="p-8 bg-gray-900 border-gray-800">
-                <div className="relative">
-                  {/* Frontend Client */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg border-2 border-blue-400">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">Frontend API Client</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">lib/api.ts sends HTTP requests</p>
-                  </div>
-
-                  {/* Arrow Down */}
-                  <div className="flex justify-center mb-8">
-                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* FastAPI Server */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg border-2 border-green-400">
-                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" alt="FastAPI" className="w-12 h-12" />
-                    </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">FastAPI Server</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">REST API endpoints on port 8000</p>
-                  </div>
-
-                  {/* Arrow Down */}
-                  <div className="flex justify-center mb-8">
-                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* Routes - Split into two columns */}
-                  <div className="grid md:grid-cols-2 gap-8 mb-8">
-                    {/* Lessons Route */}
-                    <div className="flex flex-col items-center">
-                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg border-2 border-cyan-400">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                      </div>
-                      <h3 className="text-lg font-semibold mt-4 mb-2">Lessons API</h3>
-                      <p className="text-sm text-gray-400 text-center">CRUD operations for lessons</p>
-                    </div>
-
-                    {/* Progress Route */}
-                    <div className="flex flex-col items-center">
-                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg border-2 border-yellow-400">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                      </div>
-                      <h3 className="text-lg font-semibold mt-4 mb-2">Progress API</h3>
-                      <p className="text-sm text-gray-400 text-center">Track user learning progress</p>
-                    </div>
-                  </div>
-
-                  {/* Arrows converging */}
-                  <div className="flex justify-center mb-8">
-                    <div className="relative w-32 h-16">
-                      <svg className="absolute left-0 top-0 w-16 h-16 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                      </svg>
-                      <svg className="absolute right-0 top-0 w-16 h-16 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Database */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg border-2 border-indigo-400">
-                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" alt="PostgreSQL" className="w-12 h-12" />
-                    </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">Supabase PostgreSQL</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">Stores lessons and user progress data</p>
-                  </div>
-
-                  {/* Arrow Down */}
-                  <div className="flex justify-center mb-8">
-                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
-
-                  {/* SQLAlchemy ORM */}
-                  <div className="flex flex-col items-center mb-12">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg border-2 border-teal-400">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                      </svg>
-                    </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">SQLAlchemy ORM</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">Database models (Lessons, UserProgress)</p>
-                  </div>
-
-                  {/* Training Pipeline - Separate section */}
-                  <div className="border-t border-gray-800 pt-8">
-                    <div className="flex flex-col items-center mb-8">
-                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg border-2 border-red-400">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg" alt="PyTorch" className="w-12 h-12" />
-                      </div>
-                      <h3 className="text-xl font-semibold mt-4 mb-2">Training Pipeline</h3>
-                      <p className="text-sm text-gray-400 text-center max-w-xs">PyTorch model training & ONNX export</p>
-                    </div>
-
-                    {/* Arrow Down */}
-                    <div className="flex justify-center mb-8">
-                      <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                      </svg>
-                    </div>
-
-                    {/* PyTorch Training */}
-                    <div className="flex flex-col items-center mb-8">
-                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-orange-400">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                      </div>
-                      <h3 className="text-xl font-semibold mt-4 mb-2">PyTorch Training</h3>
-                      <p className="text-sm text-gray-400 text-center max-w-xs">train.py - MLP model training on 87K+ samples</p>
-                    </div>
-
-                    {/* Arrow Down */}
-                    <div className="flex justify-center mb-8">
-                      <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                      </svg>
-                    </div>
-
-                    {/* ONNX Export */}
-                    <div className="flex flex-col items-center">
-                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg border-2 border-amber-400">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                      </div>
-                      <h3 className="text-xl font-semibold mt-4 mb-2">ONNX Export</h3>
-                      <p className="text-sm text-gray-400 text-center max-w-xs">Exported to frontend/public/models/ for browser inference</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </div>
           </motion.section>
 
         </div>
