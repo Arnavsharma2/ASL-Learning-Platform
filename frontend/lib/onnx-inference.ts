@@ -95,6 +95,12 @@ class ONNXInference {
         console.log(`  Classes: ${this.labels.num_classes}`);
       }
       console.log(`  Throttled to: ~10 FPS for optimal performance`);
+
+      // Initialize cloud inference availability check (for API Gateway)
+      // This is async but we don't wait for it - it will be checked on first predict
+      cloudInference.checkAvailability().catch(() => {
+        // Silently fail - cloud inference will be unavailable
+      });
     } catch (error) {
       console.error('Failed to load ONNX model:', error);
       throw error;
@@ -106,10 +112,36 @@ class ONNXInference {
   async predict(landmarks: number[][]): Promise<ModelPrediction> {
     const startTime = performance.now();
 
-    // Try SageMaker first if configured
-    if (sageMakerInference.isConfigured()) {
+    // Prioritize API Gateway (cloud inference) over direct SageMaker
+    // API Gateway is the proper way to access SageMaker from browser
+    // Check cloud inference availability if not already checked
+    if (!cloudInference.isReady() && process.env.NEXT_PUBLIC_INFERENCE_API_URL) {
+      await cloudInference.checkAvailability();
+    }
+
+    // Try cloud API (API Gateway) first if available
+    if (cloudInference.isReady()) {
       try {
-        console.log('Using AWS SageMaker inference...');
+        console.log('Using cloud API inference (API Gateway)...');
+        const cloudResult = await cloudInference.predict(landmarks);
+        return {
+          sign: cloudResult.sign,
+          confidence: cloudResult.confidence,
+          probabilities: cloudResult.probabilities,
+          inferenceMode: 'cloud',
+          inferenceTimeMs: cloudResult.inference_time_ms,
+        };
+      } catch (error) {
+        console.warn('Cloud inference failed, falling back to browser:', error);
+        // Fall through to browser inference
+      }
+    }
+
+    // Try direct SageMaker only if cloud inference is not available
+    // (Direct SageMaker requires AWS credentials and won't work from browser)
+    if (sageMakerInference.isConfigured() && !cloudInference.isReady()) {
+      try {
+        console.log('Using AWS SageMaker inference (direct - may require credentials)...');
         const sageMakerResult = await sageMakerInference.predict(landmarks);
         const inferenceTime = performance.now() - startTime;
         return {
@@ -121,24 +153,6 @@ class ONNXInference {
         };
       } catch (error) {
         console.warn('SageMaker inference failed, falling back to browser:', error);
-        // Fall through to browser inference
-      }
-    }
-
-    // Try cloud API if available
-    if (cloudInference.isReady()) {
-      try {
-        console.log('Using cloud API inference...');
-        const cloudResult = await cloudInference.predict(landmarks);
-        return {
-          sign: cloudResult.sign,
-          confidence: cloudResult.confidence,
-          probabilities: cloudResult.probabilities,
-          inferenceMode: 'cloud',
-          inferenceTimeMs: cloudResult.inference_time_ms,
-        };
-      } catch (error) {
-        console.warn('Cloud inference failed, falling back to browser:', error);
         // Fall through to browser inference
       }
     }
