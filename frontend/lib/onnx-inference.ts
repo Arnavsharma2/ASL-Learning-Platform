@@ -110,20 +110,23 @@ class ONNXInference {
   }
 
   async predict(landmarks: number[][]): Promise<ModelPrediction> {
+    console.log('[ONNX] predict() called with', landmarks.length, 'landmarks');
     const startTime = performance.now();
 
     // Prioritize API Gateway (cloud inference) over direct SageMaker
     // API Gateway is the proper way to access SageMaker from browser
     // Check cloud inference availability if not already checked
     if (!cloudInference.isReady() && process.env.NEXT_PUBLIC_INFERENCE_API_URL) {
+      console.log('[ONNX] Checking cloud inference availability...');
       await cloudInference.checkAvailability();
     }
 
     // Try cloud API (API Gateway) first if available
     if (cloudInference.isReady()) {
       try {
-        console.log('Using cloud API inference (API Gateway)...');
+        console.log('[ONNX] Using cloud API inference (API Gateway)...');
         const cloudResult = await cloudInference.predict(landmarks);
+        console.log('[ONNX] Cloud inference successful:', cloudResult.sign, cloudResult.confidence);
         return {
           sign: cloudResult.sign,
           confidence: cloudResult.confidence,
@@ -132,7 +135,7 @@ class ONNXInference {
           inferenceTimeMs: cloudResult.inference_time_ms,
         };
       } catch (error) {
-        console.warn('Cloud inference failed, falling back to browser:', error);
+        console.warn('[ONNX] Cloud inference failed, falling back to browser:', error);
         // Fall through to browser inference
       }
     }
@@ -158,6 +161,7 @@ class ONNXInference {
     }
 
     // Browser-based inference (fallback or default)
+    console.log('[ONNX] Using browser-based inference');
     if (!this.session || !this.labels) {
       throw new Error('Model not loaded. Call loadModel() first.');
     }
@@ -225,6 +229,7 @@ class ONNXInference {
     // Create probability map (only for A-Z letters)
     const probabilityMap = this.createProbabilityMap(probabilities, ONNXInference.ALPHABET_LETTERS);
 
+    console.log('[ONNX] Browser inference successful:', predictedSign, confidence);
     return {
       sign: predictedSign,
       confidence: confidence,

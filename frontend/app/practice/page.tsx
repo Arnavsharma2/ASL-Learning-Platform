@@ -96,10 +96,21 @@ function PracticePageContent() {
   }, []);
 
   const handleHandDetection = async (results: MediaPipeResults) => {
+    // Only log occasionally to reduce spam (every ~30th call = 1/sec at 30 FPS)
+    const shouldLog = Math.random() < 0.033;
+    if (shouldLog) {
+      console.log('[Camera Flow] handleHandDetection called, has landmarks:', !!results.multiHandLandmarks);
+    }
+    
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+      if (shouldLog) {
+        console.log('[Camera Flow] Landmarks detected:', results.multiHandLandmarks.length, 'hands');
+      }
+      
       // Skip if model is not loaded - show hand tracking only
       if (!onnxInference.isModelLoaded()) {
         // Just show that hand is detected, don't try to predict
+        console.log('[Camera Flow] Model not loaded, skipping inference');
         setDetectedSign('Hand detected (model not loaded)');
         setConfidence(0);
         return;
@@ -110,18 +121,19 @@ function PracticePageContent() {
       const timeSinceLastInference = now - lastInferenceRef.current;
 
       if (timeSinceLastInference < INFERENCE_THROTTLE_MS) {
+        // Don't log throttling - happens frequently
         return; // Skip this frame - too soon since last inference
       }
 
       // Skip if already processing to prevent concurrent runs
       if (isProcessingRef.current) {
-        console.log('Skipping - still processing previous frame');
+        console.warn('[Camera Flow] ⚠️ Skipping - still processing previous frame (this should be rare!)');
         return; // Skip this frame
       }
 
       lastInferenceRef.current = now;
       isProcessingRef.current = true;
-      console.log('Starting inference...');
+      console.log('[Camera Flow] ✓ Starting inference...');
 
       // Performance monitoring: track FPS
       frameCountRef.current++;
@@ -143,6 +155,7 @@ function PracticePageContent() {
         const sign = prediction.sign;
         const conf = prediction.confidence;
 
+        console.log('[Camera Flow] ✓ Inference result:', sign, '(' + (conf * 100).toFixed(0) + '%)');
         setDetectedSign(sign);
         setConfidence(conf);
 
@@ -199,14 +212,15 @@ function PracticePageContent() {
           }
         }
       } catch (error) {
-        console.error('Inference error:', error);
+        console.error('[Camera Flow] Inference error:', error);
         setDetectedSign('Error');
         setConfidence(0);
       } finally {
         isProcessingRef.current = false;
-        console.log('Inference complete, ready for next frame');
+        console.log('[Camera Flow] Inference complete, ready for next frame');
       }
     } else {
+      console.log('[Camera Flow] No hands detected in this frame');
       setDetectedSign(null);
       setConfidence(0);
     }

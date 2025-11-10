@@ -100,23 +100,35 @@ export function AdaptiveCameraFeed({
       // Initialize MediaPipe Hands
       const hands = await initializeHands((results: MediaPipeResults) => {
         const canvas = canvasRef.current;
-        if (!canvas) return;
+        if (!canvas) {
+          console.log('[MediaPipe Callback] No canvas, skipping');
+          return;
+        }
 
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+        if (!ctx) {
+          console.log('[MediaPipe Callback] No context, skipping');
+          return;
+        }
 
         // Draw the hands on canvas - pass video element to ensure video is always drawn
         drawHands(ctx, results, width, height, videoRef.current || undefined);
 
         // Update hand count
         const currentHandCount = results.multiHandLandmarks?.length || 0;
+        // Only log when hand count changes to avoid spam
         if (currentHandCount !== lastHandCountRef.current) {
+          console.log('[MediaPipe Callback] Hand count changed:', lastHandCountRef.current, '->', currentHandCount);
           lastHandCountRef.current = currentHandCount;
           setHandsDetected(currentHandCount);
         }
 
         // Callback for hand detection
         if (onHandDetected && results.multiHandLandmarks) {
+          // Only log occasionally to avoid spam (every 30th frame = ~1 per second at 30 FPS)
+          if (Math.random() < 0.033) {
+            console.log('[MediaPipe Callback] Calling onHandDetected (logged ~1/sec)');
+          }
           onHandDetected(results);
         }
       });
