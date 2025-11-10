@@ -374,24 +374,33 @@ export default function TimeChallengePage() {
               {/* Left: Camera Feed */}
               <div>
                 <Card className="p-4 bg-gray-900/30 border-gray-800">
-                  <div className="relative bg-black rounded-lg overflow-hidden" style={{ width: 640, height: 480 }}>
+                  <div className="relative bg-black rounded-lg overflow-hidden w-full" style={{ aspectRatio: '4/3', maxWidth: '640px' }}>
                     <video
                       ref={videoRef}
-                      className="absolute top-0 left-0 opacity-0"
-                      style={{ width: 640, height: 480 }}
+                      className="absolute top-0 left-0 w-full h-full object-cover opacity-0"
                       playsInline
                       muted
+                      autoPlay
                     />
                     <canvas
                       ref={canvasRef}
                       width={640}
                       height={480}
-                      className="absolute top-0 left-0"
+                      className="absolute top-0 left-0 w-full h-full object-cover"
                     />
+
+                    {/* Camera not active overlay */}
+                    {!cameraActive && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white">
+                        <div className="text-center">
+                          <p className="text-lg mb-2">Camera initializing...</p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Hint Overlay */}
                     {showHint && (
-                      <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center">
+                      <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-10">
                         <p className="text-yellow-400 text-xl mb-4">Time's up! Here's a hint:</p>
                         <div className="text-9xl font-bold text-white mb-4">
                           {challengeLetters[currentLetterIndex]}
