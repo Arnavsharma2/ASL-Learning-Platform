@@ -70,6 +70,10 @@ export async function initializeHands(
   // Wait a bit more to ensure MediaPipe is fully ready to process frames
   await new Promise(resolve => setTimeout(resolve, 100));
 
+  // Mark as initialized to prevent reuse after close
+  (hands as any).__isInitialized = true;
+  (hands as any).__isClosed = false;
+
   return hands;
 }
 
@@ -156,11 +160,23 @@ export async function startCamera(
         return;
       }
 
+      // Check if hands instance is still valid before sending
+      if ((hands as any).__isClosed) {
+        console.warn('MediaPipe instance was closed, stopping frame processing');
+        shouldContinue = false;
+        isProcessing = false;
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+        return;
+      }
+
       // Process frame asynchronously
       hands.send({ image: videoElement })
         .catch((error: any) => {
           console.error('Error sending frame to MediaPipe:', error);
-          // Stop processing on resource/loading errors to prevent infinite loop
+          // Stop processing on resource/loading errors or deleted object errors
           const errorMsg = error?.message || error?.toString() || '';
           if (
             errorMsg.includes('resource') ||
@@ -169,7 +185,9 @@ export async function startCamera(
             errorMsg.includes('not found') ||
             errorMsg.includes('Failed to fetch') ||
             errorMsg.includes('memory access out of bounds') ||
-            errorMsg.includes('RuntimeError')
+            errorMsg.includes('RuntimeError') ||
+            errorMsg.includes('deleted object') ||
+            errorMsg.includes('BindingError')
           ) {
             console.error('MediaPipe error detected. Stopping frame processing.');
             shouldContinue = false;
@@ -177,6 +195,8 @@ export async function startCamera(
               cancelAnimationFrame(animationFrameId);
               animationFrameId = null;
             }
+            // Mark as closed to prevent reuse
+            (hands as any).__isClosed = true;
             // Clear video source to stop the stream
             if (videoElement.srcObject) {
               const stream = videoElement.srcObject as MediaStream;

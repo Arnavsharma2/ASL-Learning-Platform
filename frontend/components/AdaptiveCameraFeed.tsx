@@ -340,9 +340,12 @@ export function AdaptiveCameraFeed({
       // Close MediaPipe
       if (handsRef.current) {
         try {
+          // Mark as closed BEFORE calling close to prevent any pending frame operations
+          (handsRef.current as any).__isClosed = true;
           handsRef.current.close();
         } catch (e) {
-          // Ignore
+          // Ignore errors during cleanup
+          console.debug('MediaPipe cleanup error (expected):', e);
         }
         handsRef.current = null;
       }
