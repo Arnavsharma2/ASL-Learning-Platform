@@ -34,7 +34,8 @@ export default function DataCollectionPage() {
     if (!isRecording || !selectedSign) return;
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-      const landmarks = results.multiHandLandmarks[0];
+      // Safe to use ! because we checked multiHandLandmarks exists in if statement above
+      const landmarks = results.multiHandLandmarks![0];
 
       // Flatten landmarks to array of [x, y, z] coordinates
       const flatLandmarks = (landmarks as HandLandmarks[]).map((lm: HandLandmarks) => [lm.x, lm.y, lm.z]);

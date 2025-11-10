@@ -219,7 +219,8 @@ export default function TimeChallengePage() {
     isProcessingRef.current = true;
 
     try {
-      const landmarks = results.multiHandLandmarks[0];
+      // Safe to use ! because we checked multiHandLandmarks exists in outer if statement
+      const landmarks = results.multiHandLandmarks![0];
       const landmarksArray = (landmarks as HandLandmarks[]).map((lm: HandLandmarks) => [lm.x, lm.y, lm.z]);
 
       const prediction = await onnxInference.predict(landmarksArray);

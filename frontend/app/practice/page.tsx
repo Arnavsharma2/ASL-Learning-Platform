@@ -145,7 +145,8 @@ function PracticePageContent() {
 
       try {
         // Extract landmarks from first detected hand
-        const landmarks = results.multiHandLandmarks[0];
+        // Safe to use ! because we checked multiHandLandmarks exists in outer if statement
+        const landmarks = results.multiHandLandmarks![0];
 
         // Convert landmarks to array of [x, y, z] coordinates
         const landmarksArray = (landmarks as HandLandmarks[]).map((lm: HandLandmarks) => [lm.x, lm.y, lm.z]);
