@@ -172,10 +172,19 @@ export async function startCamera(
         return;
       }
 
-      // Process frame asynchronously
+      // Process frame asynchronously with timeout protection
+      // If MediaPipe hangs, reset isProcessing after 1 second to prevent blocking
+      const frameProcessingStartTime = Date.now();
+      const frameTimeout = setTimeout(() => {
+        if (isProcessing && Date.now() - frameProcessingStartTime > 1000) {
+          console.warn('[MediaPipe] Frame processing timeout - resetting isProcessing flag');
+          isProcessing = false;
+        }
+      }, 1000);
+
       hands.send({ image: videoElement })
         .catch((error: any) => {
-          console.error('Error sending frame to MediaPipe:', error);
+          console.error('[MediaPipe] Error sending frame:', error);
           // Stop processing on resource/loading errors or deleted object errors
           const errorMsg = error?.message || error?.toString() || '';
           if (
@@ -189,7 +198,7 @@ export async function startCamera(
             errorMsg.includes('deleted object') ||
             errorMsg.includes('BindingError')
           ) {
-            console.error('MediaPipe error detected. Stopping frame processing.');
+            console.error('[MediaPipe] Fatal error detected. Stopping frame processing.');
             shouldContinue = false;
             if (animationFrameId) {
               cancelAnimationFrame(animationFrameId);
@@ -206,6 +215,7 @@ export async function startCamera(
           }
         })
         .finally(() => {
+          clearTimeout(frameTimeout);
           isProcessing = false;
         });
     }

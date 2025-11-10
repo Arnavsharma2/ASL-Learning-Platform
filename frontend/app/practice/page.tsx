@@ -96,7 +96,15 @@ function PracticePageContent() {
   }, []);
 
   const handleHandDetection = async (results: MediaPipeResults) => {
-    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+    // Log all callbacks to verify MediaPipe is continuously calling us
+    const hasHands = results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
+    const now = Date.now();
+    if (!(window as any).__lastHandDetectionLog || now - (window as any).__lastHandDetectionLog > 1000) {
+      console.log(`[handleHandDetection] Called - hands: ${hasHands ? 'yes' : 'no'}, processing: ${isProcessingRef.current}`);
+      (window as any).__lastHandDetectionLog = now;
+    }
+
+    if (hasHands) {
       // Skip if model is not loaded - show hand tracking only
       if (!onnxInference.isModelLoaded()) {
         // Just show that hand is detected, don't try to predict
@@ -106,7 +114,6 @@ function PracticePageContent() {
       }
 
       // Time-based throttling: only run inference every INFERENCE_THROTTLE_MS
-      const now = Date.now();
       const timeSinceLastInference = now - lastInferenceRef.current;
 
       if (timeSinceLastInference < INFERENCE_THROTTLE_MS) {
@@ -115,13 +122,13 @@ function PracticePageContent() {
 
       // Skip if already processing to prevent concurrent runs
       if (isProcessingRef.current) {
-        console.log('Skipping - still processing previous frame');
+        console.log('[handleHandDetection] Skipping - still processing previous frame');
         return; // Skip this frame
       }
 
       lastInferenceRef.current = now;
       isProcessingRef.current = true;
-      console.log('Starting inference...');
+      console.log('[handleHandDetection] Starting inference...');
 
       // Performance monitoring: track FPS
       frameCountRef.current++;
@@ -138,8 +145,13 @@ function PracticePageContent() {
         // Convert landmarks to array of [x, y, z] coordinates
         const landmarksArray = (landmarks as HandLandmarks[]).map((lm: HandLandmarks) => [lm.x, lm.y, lm.z]);
 
-        // Run ONNX inference directly in browser
-        const prediction = await onnxInference.predict(landmarksArray);
+        // Run ONNX inference with timeout protection (10 seconds max)
+        const inferencePromise = onnxInference.predict(landmarksArray);
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Inference timeout after 10 seconds')), 10000)
+        );
+        
+        const prediction = await Promise.race([inferencePromise, timeoutPromise]) as any;
         const sign = prediction.sign;
         const conf = prediction.confidence;
 
@@ -199,16 +211,20 @@ function PracticePageContent() {
           }
         }
       } catch (error) {
-        console.error('Inference error:', error);
+        console.error('[handleHandDetection] Inference error:', error);
         setDetectedSign('Error');
         setConfidence(0);
       } finally {
         isProcessingRef.current = false;
-        console.log('Inference complete, ready for next frame');
+        console.log('[handleHandDetection] Inference complete, ready for next frame');
       }
     } else {
-      setDetectedSign(null);
-      setConfidence(0);
+      // No hands detected - but MediaPipe is still processing frames
+      // Only update UI if we had a previous detection (don't spam null updates)
+      if (detectedSign !== null) {
+        // Keep last detection visible, don't clear immediately
+        // This prevents flickering when hand briefly leaves frame
+      }
     }
   };
 

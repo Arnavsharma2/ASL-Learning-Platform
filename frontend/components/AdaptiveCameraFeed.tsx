@@ -115,8 +115,14 @@ export function AdaptiveCameraFeed({
           setHandsDetected(currentHandCount);
         }
 
-        // Callback for hand detection
-        if (onHandDetected && results.multiHandLandmarks) {
+        // Callback for hand detection - call even if no hands to track continuous processing
+        if (onHandDetected) {
+          // Log when MediaPipe callback is invoked (throttled to avoid spam)
+          const now = Date.now();
+          if (!(window as any).__lastMediaPipeLog || now - (window as any).__lastMediaPipeLog > 1000) {
+            console.log(`[MediaPipe] Frame processed - hands detected: ${currentHandCount}`);
+            (window as any).__lastMediaPipeLog = now;
+          }
           onHandDetected(results);
         }
       });
