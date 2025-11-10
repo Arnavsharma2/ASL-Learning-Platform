@@ -499,6 +499,20 @@ export default function TimeChallengePage() {
                       </div>
                     )}
                   </div>
+                  
+                  {/* Current Detection under camera */}
+                  <div className="mt-4 p-4 bg-gray-800/50 rounded-lg">
+                    <p className="text-sm text-gray-400 mb-2">Current Detection:</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold">{detectedSign || '—'}</span>
+                      <Badge
+                        variant={confidence >= 0.80 ? "default" : "secondary"}
+                        className={confidence >= 0.80 ? "bg-green-600" : ""}
+                      >
+                        {(confidence * 100).toFixed(0)}%
+                      </Badge>
+                    </div>
+                  </div>
                 </Card>
               </div>
 
@@ -511,6 +525,11 @@ export default function TimeChallengePage() {
                       <Clock className="w-4 h-4" />
                       Elapsed Time
                     </span>
+                    {/* Correct Signs in top right */}
+                    <div className="flex items-center gap-2">
+                      <Target className="w-4 h-4 text-green-400" />
+                      <span className="text-lg font-bold text-green-400">{correctCount}</span>
+                    </div>
                   </div>
                   <div className="text-5xl font-bold text-yellow-400 font-mono">
                     {formatTime(elapsedTime)}
@@ -542,35 +561,6 @@ export default function TimeChallengePage() {
                   </div>
                 </Card>
 
-                {/* Detection Status */}
-                <Card className="p-4 bg-gray-900/30 border-gray-800">
-                  <p className="text-sm text-gray-400 mb-2">Current Detection:</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold">{detectedSign || '—'}</span>
-                    <Badge
-                      variant={confidence >= 0.80 ? "default" : "secondary"}
-                      className={confidence >= 0.80 ? "bg-green-600" : ""}
-                    >
-                      {(confidence * 100).toFixed(0)}%
-                    </Badge>
-                  </div>
-                </Card>
-
-                {/* Correct Count */}
-                <Card className="p-6 bg-gradient-to-r from-green-900/30 to-emerald-900/30 border-green-800/50">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-400 flex items-center gap-2">
-                      <Target className="w-4 h-4" />
-                      Correct Signs
-                    </span>
-                  </div>
-                  <div className="text-5xl font-bold text-green-400 font-mono">
-                    {correctCount}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    {challengeLetters.length > 0 ? `${Math.round((correctCount / challengeLetters.length) * 100)}% accuracy` : ''}
-                  </div>
-                </Card>
               </div>
             </div>
           )}
