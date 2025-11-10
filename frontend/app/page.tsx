@@ -154,24 +154,11 @@ export default function Home() {
                     <span className="text-xs text-gray-400">Tailwind</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
-                        <circle cx="9" cy="12" r="1.5" fill="white"/>
-                        <circle cx="15" cy="12" r="1.5" fill="white"/>
-                        <path d="M8 16h8" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                      </svg>
-                    </div>
+                    <img src="https://viz.mediapipe.dev/logo.png" alt="MediaPipe" className="w-16 h-16 object-contain" />
                     <span className="text-xs text-gray-400">MediaPipe</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg">
-                      <svg className="w-10 h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="white"/>
-                        <path d="M9 9h6M9 15h6M9 12h6" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                        <circle cx="18" cy="6" r="2" fill="white"/>
-                      </svg>
-                    </div>
+                    <img src="https://api.nuget.org/v3-flatcontainer/microsoft.ml.onnxruntime/1.23.2/icon" alt="ONNX Runtime" className="w-16 h-16 object-contain" />
                     <span className="text-xs text-gray-400">ONNX Runtime</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
