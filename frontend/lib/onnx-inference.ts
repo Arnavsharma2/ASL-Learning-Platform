@@ -50,6 +50,7 @@ class ONNXInference {
 
       // Prioritize GPU acceleration (WebGL) over CPU (WASM)
       // WebGL uses GPU for faster inference, WASM is CPU fallback
+      // ONNX Runtime will automatically use the first available provider
       const executionProviders = ['webgl', 'wasm'];
       
       // Load ONNX model with GPU-optimized settings
@@ -62,18 +63,13 @@ class ONNXInference {
         logVerbosityLevel: 0,
       });
 
-      // Log which execution provider was actually used
-      const actualProvider = this.session.providers?.[0] || 'unknown';
-      const isGPU = actualProvider.toLowerCase().includes('webgl');
+      // Log successful model load
+      // Note: ONNX Runtime will use WebGL (GPU) if available, otherwise fallback to WASM (CPU)
       console.log(`✓ ONNX model loaded successfully`);
-      console.log(`  Execution Provider: ${actualProvider} ${isGPU ? '🚀 (GPU Accelerated)' : '⚙️ (CPU Fallback)'}`);
+      console.log(`  🚀 GPU Acceleration: Attempting WebGL (will fallback to CPU if unavailable)`);
       if (this.labels) {
         console.log(`  Model type: ${this.labels.model_type}`);
         console.log(`  Classes: ${this.labels.num_classes}`);
-      }
-      
-      if (!isGPU) {
-        console.warn('⚠️ GPU acceleration not available. Performance may be slower. Ensure hardware acceleration is enabled in your browser.');
       }
     } catch (error) {
       console.error('Failed to load ONNX model:', error);
