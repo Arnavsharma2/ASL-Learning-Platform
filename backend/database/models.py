@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
@@ -97,6 +97,7 @@ class UserProgressResponse(UserProgressBase):
         if isinstance(v, UUID):
             return str(v)
         return str(v) if v is not None else v
+
 
     class Config:
         from_attributes = True

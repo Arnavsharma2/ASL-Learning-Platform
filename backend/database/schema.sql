@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS user_progress (
     lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
     attempts INTEGER DEFAULT 0,
     accuracy FLOAT,
+    status VARCHAR(20) DEFAULT 'not_started' CHECK (status IN ('not_started', 'in_progress', 'mastered')),
     last_practiced TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(user_id, lesson_id)
@@ -123,3 +124,25 @@ CREATE POLICY "Anyone can view lessons"
 CREATE POLICY "Authenticated users can create lessons"
     ON lessons FOR INSERT
     WITH CHECK (auth.role() = 'authenticated');
+
+-- Add status column to existing user_progress table (for databases that already exist)
+-- This is safe to run multiple times due to IF NOT EXISTS
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'user_progress' AND column_name = 'status'
+    ) THEN
+        ALTER TABLE user_progress 
+        ADD COLUMN status VARCHAR(20) DEFAULT 'not_started' 
+        CHECK (status IN ('not_started', 'in_progress', 'mastered'));
+        
+        -- Update existing rows based on attempts and accuracy
+        UPDATE user_progress 
+        SET status = CASE
+            WHEN attempts = 0 THEN 'not_started'
+            WHEN accuracy >= 0.8 THEN 'mastered'
+            ELSE 'in_progress'
+        END;
+    END IF;
+END $$;
