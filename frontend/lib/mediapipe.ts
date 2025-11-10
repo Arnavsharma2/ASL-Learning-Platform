@@ -208,27 +208,38 @@ function drawConnectors(
   landmarks: any[],
   connections: number[][]
 ) {
+  const canvasWidth = ctx.canvas.width;
+  const canvasHeight = ctx.canvas.height;
+
   ctx.strokeStyle = '#00FF00';
   ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 
+  // Batch all strokes in a single path for better performance
+  ctx.beginPath();
   for (const [start, end] of connections) {
     const startLandmark = landmarks[start];
     const endLandmark = landmarks[end];
 
-    ctx.beginPath();
-    ctx.moveTo(startLandmark.x * ctx.canvas.width, startLandmark.y * ctx.canvas.height);
-    ctx.lineTo(endLandmark.x * ctx.canvas.width, endLandmark.y * ctx.canvas.height);
-    ctx.stroke();
+    ctx.moveTo(startLandmark.x * canvasWidth, startLandmark.y * canvasHeight);
+    ctx.lineTo(endLandmark.x * canvasWidth, endLandmark.y * canvasHeight);
   }
+  ctx.stroke();
 }
 
 function drawLandmarks(ctx: CanvasRenderingContext2D, landmarks: any[]) {
+  const canvasWidth = ctx.canvas.width;
+  const canvasHeight = ctx.canvas.height;
+
+  ctx.fillStyle = '#FF0000';
+
+  // Draw all landmarks (more efficient than creating path for each)
   for (const landmark of landmarks) {
-    ctx.fillStyle = '#FF0000';
     ctx.beginPath();
     ctx.arc(
-      landmark.x * ctx.canvas.width,
-      landmark.y * ctx.canvas.height,
+      landmark.x * canvasWidth,
+      landmark.y * canvasHeight,
       5,
       0,
       2 * Math.PI

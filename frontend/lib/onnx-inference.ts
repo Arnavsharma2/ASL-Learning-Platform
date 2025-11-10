@@ -23,6 +23,7 @@ class ONNXInference {
   private session: ort.InferenceSession | null = null;
   private labels: LabelMapping | null = null;
   private isLoading: boolean = false;
+  private static readonly ALPHABET_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
   async loadModel(): Promise<void> {
     if (this.session && this.labels) {
@@ -49,7 +50,7 @@ class ONNXInference {
 
       // Load ONNX model
       this.session = await ort.InferenceSession.create('/models/model.onnx', {
-        executionProviders: ['wasm'],
+        executionProviders: ['webgl', 'wasm'], // Try WebGL (GPU) first, fallback to WASM (CPU)
         graphOptimizationLevel: 'all',
       });
 
@@ -101,14 +102,13 @@ class ONNXInference {
     const probabilities = this.softmax(Array.from(logits));
 
     // Filter to only A-Z letters (ignore "del" and "space")
-    const alphabetLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     let bestLetterIdx = -1;
     let bestLetterProb = -1;
 
     for (let i = 0; i < probabilities.length; i++) {
       const label = this.labels.idx_to_label[i.toString()];
       // Only consider A-Z letters
-      if (alphabetLetters.includes(label) && probabilities[i] > bestLetterProb) {
+      if (ONNXInference.ALPHABET_LETTERS.includes(label) && probabilities[i] > bestLetterProb) {
         bestLetterProb = probabilities[i];
         bestLetterIdx = i;
       }
@@ -121,7 +121,7 @@ class ONNXInference {
       return {
         sign: predictedSign,
         confidence: probabilities[predictedIdx],
-        probabilities: this.createProbabilityMap(probabilities, alphabetLetters),
+        probabilities: this.createProbabilityMap(probabilities, ONNXInference.ALPHABET_LETTERS),
       };
     }
 
@@ -129,7 +129,7 @@ class ONNXInference {
     const confidence = probabilities[bestLetterIdx];
 
     // Create probability map (only for A-Z letters)
-    const probabilityMap = this.createProbabilityMap(probabilities, alphabetLetters);
+    const probabilityMap = this.createProbabilityMap(probabilities, ONNXInference.ALPHABET_LETTERS);
 
     return {
       sign: predictedSign,

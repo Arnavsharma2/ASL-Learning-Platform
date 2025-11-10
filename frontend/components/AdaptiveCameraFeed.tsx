@@ -111,6 +111,32 @@ export function AdaptiveCameraFeed({
 
       streamRef.current = stream;
 
+      // Draw video continuously on canvas (60 FPS)
+      let animationFrameId: number | null = null;
+      const drawVideoFrame = () => {
+        if (!videoRef.current || !canvasRef.current) {
+          if (animationFrameId) cancelAnimationFrame(animationFrameId);
+          return;
+        }
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(videoRef.current, 0, 0, width, height);
+        }
+
+        animationFrameId = requestAnimationFrame(drawVideoFrame);
+      };
+      animationFrameId = requestAnimationFrame(drawVideoFrame);
+
+      // Store cleanup function for video drawing
+      (videoRef.current as any).__stopVideoDrawing = () => {
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+      };
+
       // Process frames periodically (like the other repo - every few seconds)
       const processServerFrame = async () => {
         if (!videoRef.current || !canvasRef.current) return;
@@ -129,45 +155,39 @@ export function AdaptiveCameraFeed({
           // Send to server for detection
           const response = await detectHandsOnServer(imageDataUrl, false);
 
-          // If server returns no landmarks (MediaPipe not available), skip processing
-          if (!response || response.hand_count === 0) {
-            return;
-          }
-
-          // Convert to MediaPipe format and trigger callback
-          const mediaPipeResults = convertServerLandmarksToMediaPipe(response.landmarks);
-
-          // Draw on canvas
-          const canvas = canvasRef.current;
-          if (!canvas) return;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) return;
-
-          // Clear and draw video frame
-          ctx.clearRect(0, 0, width, height);
-          ctx.drawImage(videoRef.current, 0, 0, width, height);
-
-          // Draw landmarks if detected
-          if (mediaPipeResults.multiHandLandmarks?.length > 0) {
-            drawHands(ctx, {
-              image: videoRef.current,
-              ...mediaPipeResults
-            }, width, height);
-          }
-
           // Update hand count
-          const currentHandCount = response.hand_count;
+          const currentHandCount = response?.hand_count || 0;
           if (currentHandCount !== lastHandCountRef.current) {
             lastHandCountRef.current = currentHandCount;
             setHandsDetected(currentHandCount);
           }
 
-          // Callback
-          if (onHandDetected && response.landmarks.length > 0) {
-            onHandDetected({
-              image: videoRef.current,
-              ...mediaPipeResults
-            });
+          // If server returns landmarks, draw them
+          if (response && response.hand_count > 0) {
+            // Convert to MediaPipe format
+            const mediaPipeResults = convertServerLandmarksToMediaPipe(response.landmarks);
+
+            // Get canvas context
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            // Draw landmarks on top of video
+            if (mediaPipeResults.multiHandLandmarks?.length > 0) {
+              drawHands(ctx, {
+                image: videoRef.current,
+                ...mediaPipeResults
+              }, width, height);
+            }
+
+            // Callback
+            if (onHandDetected) {
+              onHandDetected({
+                image: videoRef.current,
+                ...mediaPipeResults
+              });
+            }
           }
         } catch (err: any) {
           console.error('Server frame processing error:', err);
@@ -180,6 +200,10 @@ export function AdaptiveCameraFeed({
 
       // Process every 2 seconds for smoothness (more frequent than the 10s in the other repo)
       serverIntervalRef.current = setInterval(processServerFrame, 2000);
+
+      // Do first detection immediately
+      processServerFrame();
+
       setError(null);
     } catch (err: any) {
       console.error('Error initializing server mode:', err);
@@ -224,6 +248,11 @@ export function AdaptiveCameraFeed({
       // Stop frame processing
       if (videoRef.current && (videoRef.current as any).__stopFrameProcessing) {
         (videoRef.current as any).__stopFrameProcessing();
+      }
+
+      // Stop video drawing (for server mode)
+      if (videoRef.current && (videoRef.current as any).__stopVideoDrawing) {
+        (videoRef.current as any).__stopVideoDrawing();
       }
 
       // Stop camera stream
