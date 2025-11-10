@@ -55,7 +55,8 @@ export async function initializeHands(
   });
 
   // Wait a bit for MediaPipe to fully initialize before setting options
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // MediaPipe WASM needs time to load and initialize
+  await new Promise(resolve => setTimeout(resolve, 200));
 
   hands.setOptions({
     maxNumHands: 1, // Optimize: only track 1 hand for ASL recognition (was 2)
@@ -65,6 +66,9 @@ export async function initializeHands(
   });
 
   hands.onResults(onResults);
+
+  // Wait a bit more to ensure MediaPipe is fully ready to process frames
+  await new Promise(resolve => setTimeout(resolve, 100));
 
   return hands;
 }
@@ -82,6 +86,25 @@ export async function startCamera(
 
   videoElement.srcObject = stream;
   await videoElement.play();
+
+  // Wait for video to be ready with valid dimensions before starting frame processing
+  // This prevents "memory access out of bounds" errors
+  await new Promise<void>((resolve, reject) => {
+    let attempts = 0;
+    const maxAttempts = 100; // 5 seconds max wait (100 * 50ms)
+    const checkReady = () => {
+      attempts++;
+      if (videoElement.readyState >= 2 && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
+        resolve();
+      } else if (attempts >= maxAttempts) {
+        reject(new Error('Video element failed to become ready'));
+      } else {
+        // Check again after a short delay
+        setTimeout(checkReady, 50);
+      }
+    };
+    checkReady();
+  });
 
   // Performance optimization: limit MediaPipe to ~20 FPS (50ms between frames)
   // This prevents overwhelming the GPU/CPU while still feeling responsive
@@ -102,6 +125,19 @@ export async function startCamera(
       return;
     }
 
+    // Validate video element is ready before processing
+    // This prevents "memory access out of bounds" errors
+    const videoReady = videoElement.readyState >= 2; // HAVE_CURRENT_DATA or higher
+    const hasValidDimensions = videoElement.videoWidth > 0 && videoElement.videoHeight > 0;
+    
+    if (!videoReady || !hasValidDimensions) {
+      // Video not ready yet, continue loop but don't process
+      if (shouldContinue) {
+        animationFrameId = requestAnimationFrame(sendFrame);
+      }
+      return;
+    }
+
     // Throttle frame processing - only process if enough time has passed
     const timeSinceLastFrame = currentTime - lastFrameTime;
     const shouldProcess = timeSinceLastFrame >= FRAME_THROTTLE_MS;
@@ -110,6 +146,15 @@ export async function startCamera(
     if (!isProcessing && shouldProcess) {
       isProcessing = true;
       lastFrameTime = currentTime;
+
+      // Double-check video is still valid before sending
+      if (videoElement.readyState < 2 || videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+        isProcessing = false;
+        if (shouldContinue) {
+          animationFrameId = requestAnimationFrame(sendFrame);
+        }
+        return;
+      }
 
       // Process frame asynchronously
       hands.send({ image: videoElement })
@@ -122,9 +167,11 @@ export async function startCamera(
             errorMsg.includes('wasm') ||
             errorMsg.includes('emscripten') ||
             errorMsg.includes('not found') ||
-            errorMsg.includes('Failed to fetch')
+            errorMsg.includes('Failed to fetch') ||
+            errorMsg.includes('memory access out of bounds') ||
+            errorMsg.includes('RuntimeError')
           ) {
-            console.error('MediaPipe resource error detected. Stopping frame processing.');
+            console.error('MediaPipe error detected. Stopping frame processing.');
             shouldContinue = false;
             if (animationFrameId) {
               cancelAnimationFrame(animationFrameId);

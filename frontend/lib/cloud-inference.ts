@@ -21,14 +21,18 @@ class CloudInference {
   private isAvailable: boolean = false;
 
   constructor() {
+    // API Gateway URL already includes /predict, so use it directly
+    // For other APIs, you might need to append paths
+    const baseUrl = process.env.NEXT_PUBLIC_INFERENCE_API_URL || '';
     this.config = {
-      apiUrl: process.env.NEXT_PUBLIC_INFERENCE_API_URL || '',
+      apiUrl: baseUrl.endsWith('/predict') ? baseUrl.replace('/predict', '') : baseUrl,
       timeout: 5000, // 5 second timeout
     };
   }
 
   /**
    * Check if cloud inference is configured and available
+   * For API Gateway, we skip health check and assume available if URL is configured
    */
   async checkAvailability(): Promise<boolean> {
     if (!this.config.apiUrl) {
@@ -37,6 +41,16 @@ class CloudInference {
       return false;
     }
 
+    // For API Gateway, we don't have a health endpoint
+    // Just check if URL is configured - actual availability will be tested on first request
+    if (this.config.apiUrl.includes('execute-api')) {
+      // API Gateway URL - assume available if configured
+      this.isAvailable = true;
+      console.log('Cloud inference configured (API Gateway)');
+      return true;
+    }
+
+    // For other APIs, try health check
     try {
       const response = await fetch(`${this.config.apiUrl}/health`, {
         method: 'GET',
@@ -50,7 +64,12 @@ class CloudInference {
         return this.isAvailable;
       }
     } catch (error) {
-      console.warn('Cloud inference not available:', error);
+      console.warn('Cloud inference health check failed:', error);
+      // For API Gateway, this is expected - mark as available anyway
+      if (this.config.apiUrl.includes('execute-api')) {
+        this.isAvailable = true;
+        return true;
+      }
       this.isAvailable = false;
     }
 
