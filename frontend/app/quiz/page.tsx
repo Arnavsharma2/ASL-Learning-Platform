@@ -195,22 +195,25 @@ export default function QuizPage() {
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">
-              <h1 className="text-4xl font-bold mb-2">ASL Quiz</h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <h1 className="text-4xl font-light mb-2 relative inline-block">
+                ASL Quiz
+                <div className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-white via-white/50 to-transparent" />
+              </h1>
+              <p className="text-gray-400 mt-4">
                 Test your knowledge of ASL signs
               </p>
             </div>
 
             {/* Quiz Mode Selection */}
-            <Card className="p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Select Quiz Mode</h2>
+            <Card className="p-6 mb-6 bg-gray-900/30 border-gray-800">
+              <h2 className="text-xl font-semibold mb-4 text-gray-200">Select Quiz Mode</h2>
               <div className="grid md:grid-cols-3 gap-4">
                 <button
                   onClick={() => setSelectionMode('random-all')}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     selectionMode === 'random-all'
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                      ? 'border-white bg-white/10'
+                      : 'border-gray-700 hover:border-gray-600 bg-gray-900/30'
                   }`}
                 >
                   <h3 className="font-semibold mb-1">Random - All</h3>
@@ -223,12 +226,12 @@ export default function QuizPage() {
                   onClick={() => setSelectionMode('random-category')}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     selectionMode === 'random-category'
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                      ? 'border-white bg-white/10'
+                      : 'border-gray-700 hover:border-gray-600 bg-gray-900/30'
                   }`}
                 >
                   <h3 className="font-semibold mb-1">Category</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400">
                     Random signs from one category
                   </p>
                 </button>
@@ -237,12 +240,12 @@ export default function QuizPage() {
                   onClick={() => setSelectionMode('custom')}
                   className={`p-4 rounded-lg border-2 transition-all ${
                     selectionMode === 'custom'
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                      ? 'border-white bg-white/10'
+                      : 'border-gray-700 hover:border-gray-600 bg-gray-900/30'
                   }`}
                 >
                   <h3 className="font-semibold mb-1">Custom</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400">
                     Choose specific letters
                   </p>
                 </button>

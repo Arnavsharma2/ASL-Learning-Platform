@@ -139,28 +139,31 @@ export default function LearnPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Browse Lessons</h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h2 className="text-4xl font-light mb-2 relative inline-block">
+              Browse Lessons
+              <div className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-white via-white/50 to-transparent" />
+            </h2>
+            <p className="text-gray-400 mt-4">
               Learn ASL signs organized by category
             </p>
           </div>
 
           {/* Progress Summary (only if logged in) */}
           {user && totalLessons > 0 && (
-            <Card className="p-6 mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
-              <h3 className="text-lg font-semibold mb-4">Your Progress</h3>
+            <Card className="p-6 mb-6 bg-gradient-to-r from-gray-900/40 to-gray-800/40 border-gray-700 backdrop-blur-sm">
+              <h3 className="text-lg font-semibold mb-4 text-gray-200">Your Progress</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Lessons</p>
+                <div className="p-4 rounded-lg bg-gray-900/30 border border-gray-800">
+                  <p className="text-sm text-gray-400 mb-2">Total Lessons</p>
                   <p className="text-3xl font-bold">{totalLessons}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">In Progress</p>
-                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{inProgressCount}</p>
+                <div className="p-4 rounded-lg bg-blue-900/20 border border-blue-800/50">
+                  <p className="text-sm text-gray-400 mb-2">In Progress</p>
+                  <p className="text-3xl font-bold text-blue-400">{inProgressCount}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Mastered</p>
-                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">{masteredCount}</p>
+                <div className="p-4 rounded-lg bg-green-900/20 border border-green-800/50">
+                  <p className="text-sm text-gray-400 mb-2">Mastered</p>
+                  <p className="text-3xl font-bold text-green-400">{masteredCount}</p>
                 </div>
               </div>
               <div className="mt-4">
@@ -226,7 +229,7 @@ export default function LearnPage() {
 
                 return (
                   <Link key={lesson.id} href={`/learn/${lesson.id}`}>
-                    <Card className="p-6 hover:shadow-lg transition-all h-full cursor-pointer group">
+                    <Card className="p-6 bg-gray-900/30 border-gray-800 hover:bg-gray-900/50 hover:border-gray-700 hover:shadow-xl transition-all h-full cursor-pointer group">
                       <div className="space-y-3">
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-2">

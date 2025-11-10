@@ -67,12 +67,17 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-32"
+            className="text-center mb-32 relative"
           >
-            <h1 className="text-6xl md:text-8xl font-light tracking-tight mb-8">
+            {/* Subtle background gradient for depth */}
+            <div className="absolute inset-0 bg-gradient-radial from-white/5 via-transparent to-transparent blur-3xl -z-10" />
+
+            <h1 className="text-6xl md:text-8xl font-light tracking-tight mb-8 leading-tight">
               Learn Sign Language
               <br />
-              <span className="font-normal">with Computer Vision</span>
+              <span className="font-normal bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                with Computer Vision
+              </span>
             </h1>
             </motion.div>
 
@@ -132,15 +137,23 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="mb-32"
           >
-            <h2 className="text-4xl md:text-5xl font-light text-center mb-16">
-              Built with:
+            <h2 className="text-4xl md:text-5xl font-light text-center mb-16 relative">
+              <span className="relative inline-block">
+                Built with:
+                <div className="absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+              </span>
             </h2>
             
             <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
               {/* Frontend */}
-              <div className="text-center">
-                <h3 className="text-2xl font-normal mb-8 text-gray-300">Frontend</h3>
-                <div className="flex flex-wrap justify-center gap-6 items-center">
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <h3 className="text-2xl font-normal text-gray-300 relative inline-block">
+                    Frontend
+                    <div className="absolute -bottom-2 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
+                  </h3>
+                </div>
+                <div className="flex flex-wrap justify-center gap-6 items-center bg-gray-900/30 rounded-2xl p-8 border border-gray-800 hover:border-gray-700 transition-all">
                   <div className="flex flex-col items-center gap-2">
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" alt="Next.js" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">Next.js</span>
@@ -169,9 +182,14 @@ export default function Home() {
               </div>
 
               {/* Backend */}
-              <div className="text-center">
-                <h3 className="text-2xl font-normal mb-8 text-gray-300">Backend</h3>
-                <div className="flex flex-wrap justify-center gap-6 items-center">
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <h3 className="text-2xl font-normal text-gray-300 relative inline-block">
+                    Backend
+                    <div className="absolute -bottom-2 left-0 w-0 h-px bg-white transition-all duration-300 group-hover:w-full" />
+                  </h3>
+                </div>
+                <div className="flex flex-wrap justify-center gap-6 items-center bg-gray-900/30 rounded-2xl p-8 border border-gray-800 hover:border-gray-700 transition-all">
                   <div className="flex flex-col items-center gap-2">
                     <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" alt="FastAPI" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">FastAPI</span>
@@ -208,8 +226,11 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="mb-32"
           >
-            <h2 className="text-4xl md:text-5xl font-light text-center mb-16">
-              Training Graphs
+            <h2 className="text-4xl md:text-5xl font-light text-center mb-16 relative">
+              <span className="relative inline-block">
+                Training Graphs
+                <div className="absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+              </span>
             </h2>
             
             {/* Training Data */}
@@ -231,7 +252,7 @@ export default function Home() {
               return (
                 <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                   {/* Loss Chart */}
-                  <Card className="p-6 bg-gray-900 border-gray-800">
+                  <Card className="p-6 bg-gray-900/50 border-gray-800 backdrop-blur-sm hover:bg-gray-900/70 transition-all">
                     <h3 className="text-xl font-normal mb-6 text-gray-300 text-center">Training & Validation Loss</h3>
                     <ResponsiveContainer width="100%" height={350}>
                       <LineChart 
@@ -301,7 +322,7 @@ export default function Home() {
                   </Card>
 
                   {/* Accuracy Chart */}
-                  <Card className="p-6 bg-gray-900 border-gray-800">
+                  <Card className="p-6 bg-gray-900/50 border-gray-800 backdrop-blur-sm hover:bg-gray-900/70 transition-all">
                     <h3 className="text-xl font-normal mb-6 text-gray-300 text-center">Training & Validation Accuracy</h3>
                     <ResponsiveContainer width="100%" height={350}>
                       <LineChart 

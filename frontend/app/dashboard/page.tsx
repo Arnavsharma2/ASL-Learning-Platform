@@ -95,7 +95,13 @@ export default function DashboardPage() {
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8">Dashboard</h2>
+            <div className="mb-8">
+              <h2 className="text-4xl font-light mb-2 relative inline-block">
+                Dashboard
+                <div className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-white via-white/50 to-transparent" />
+              </h2>
+              <p className="text-gray-400 mt-4">Track your learning progress</p>
+            </div>
 
             {loading ? (
               <div className="text-center py-12">
@@ -122,43 +128,43 @@ export default function DashboardPage() {
               <>
                 {/* Statistics Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  <Card className="p-6">
-                    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  <Card className="p-6 bg-gray-900/30 border-gray-800 hover:bg-gray-900/50 transition-all group">
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
                       Total Attempts
                     </h3>
-                    <p className="text-3xl font-bold">{stats?.total_attempts || 0}</p>
+                    <p className="text-3xl font-bold group-hover:scale-105 transition-transform">{stats?.total_attempts || 0}</p>
                   </Card>
 
-                  <Card className="p-6">
-                    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  <Card className="p-6 bg-gray-900/30 border-gray-800 hover:bg-gray-900/50 transition-all group">
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
                       Correct Attempts
                     </h3>
-                    <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                    <p className="text-3xl font-bold text-green-400 group-hover:scale-105 transition-transform">
                       {stats?.correct_attempts || 0}
                     </p>
                   </Card>
 
-                  <Card className="p-6">
-                    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  <Card className="p-6 bg-gray-900/30 border-gray-800 hover:bg-gray-900/50 transition-all group">
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
                       Accuracy Rate
                     </h3>
-                    <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                    <p className="text-3xl font-bold text-blue-400 group-hover:scale-105 transition-transform">
                       {stats?.accuracy_rate ? Math.round(stats.accuracy_rate) : 0}%
                     </p>
                   </Card>
 
-                  <Card className="p-6">
-                    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  <Card className="p-6 bg-gray-900/30 border-gray-800 hover:bg-gray-900/50 transition-all group">
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
                       Lessons Practiced
                     </h3>
-                    <p className="text-3xl font-bold">{stats?.lessons_practiced || 0}</p>
+                    <p className="text-3xl font-bold group-hover:scale-105 transition-transform">{stats?.lessons_practiced || 0}</p>
                   </Card>
                 </div>
 
                 {/* Charts */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                  <Card className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Accuracy Over Time</h3>
+                  <Card className="p-6 bg-gray-900/30 border-gray-800 hover:border-gray-700 transition-all">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-300">Accuracy Over Time</h3>
                     {accuracyOverTime.length > 0 ? (
                       <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={accuracyOverTime}>
@@ -190,8 +196,8 @@ export default function DashboardPage() {
                     )}
                   </Card>
 
-                  <Card className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Most Practiced Signs</h3>
+                  <Card className="p-6 bg-gray-900/30 border-gray-800 hover:border-gray-700 transition-all">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-300">Most Practiced Signs</h3>
                     {signData.length > 0 ? (
                       <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={signData}>
@@ -211,8 +217,8 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Recent Sessions */}
-                <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Recent Practice Sessions</h3>
+                <Card className="p-6 bg-gray-900/30 border-gray-800">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-300">Recent Practice Sessions</h3>
                   {sessions.length > 0 ? (
                     <div className="overflow-x-auto">
                       <table className="w-full">

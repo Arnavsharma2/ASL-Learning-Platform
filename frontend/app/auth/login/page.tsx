@@ -47,16 +47,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-radial from-white/5 via-transparent to-transparent blur-3xl" />
+
+      <Card className="w-full max-w-md p-8 bg-gray-900/50 border-gray-800 backdrop-blur-md relative z-10">
         <div className="mb-6">
           <Link href="/">
-            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+            <h1 className="text-2xl font-light text-white mb-2 hover:text-gray-300 transition-colors">
               ASL Learning
             </h1>
           </Link>
-          <h2 className="text-xl font-semibold">Sign In</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <h2 className="text-xl font-semibold text-white">Sign In</h2>
+          <p className="text-sm text-gray-400 mt-1">
             Sign in to track your progress
           </p>
         </div>
@@ -78,7 +81,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all"
               placeholder="you@example.com"
             />
           </div>
@@ -93,7 +96,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all"
               placeholder="••••••••"
             />
           </div>
@@ -109,7 +112,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
+              <span className="px-2 bg-gray-900 text-gray-400">Or continue with</span>
             </div>
           </div>
 
@@ -142,9 +145,9 @@ export default function LoginPage() {
           </Button>
         </div>
 
-        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-6 text-center text-sm text-gray-400">
           Don't have an account?{' '}
-          <Link href="/auth/signup" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/auth/signup" className="text-white hover:text-gray-300 underline transition-colors">
             Sign up
           </Link>
         </p>
