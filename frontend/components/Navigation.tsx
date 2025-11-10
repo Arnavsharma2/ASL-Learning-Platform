@@ -21,7 +21,7 @@ export function Navigation() {
         <div className="flex items-center justify-between">
           <Link href="/">
             <h1 className="text-xl font-light tracking-tight cursor-pointer hover:text-gray-400 transition-colors">
-              ASL Learning Platform
+              Learn ASL
             </h1>
           </Link>
           <div className="flex items-center gap-6">
