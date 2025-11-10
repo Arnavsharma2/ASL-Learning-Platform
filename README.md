@@ -70,39 +70,6 @@ Next.js web application that provides interactive American Sign Language (ASL) l
 - **API**: FastAPI REST endpoints
 - **Deployment**: Vercel (frontend) + Render (backend) + Supabase (database)
 
-## Project Structure
-
-```
-.
-├── frontend/              # Next.js application
-│   ├── app/              # Next.js app router pages
-│   │   ├── practice/     # Real-time practice mode
-│   │   ├── learn/        # Lesson browser and details
-│   │   ├── quiz/         # Interactive quiz
-│   │   ├── reference/    # Alphabet reference guide
-│   │   └── dashboard/    # User progress dashboard
-│   ├── components/       # React components
-│   │   ├── AdaptiveCameraFeed.tsx  # Camera with hand detection
-│   │   └── Navigation.tsx           # Global navigation
-│   ├── lib/              # Utilities and API clients
-│   │   ├── onnx-inference.ts       # ONNX model inference
-│   │   ├── mediapipe.ts            # MediaPipe integration
-│   │   └── api.ts                  # Backend API client
-│   └── public/
-│       └── models/       # ONNX model and labels
-│
-└── backend/              # FastAPI application
-    ├── routes/          # API endpoints
-    │   ├── lessons.py   # Lesson CRUD operations
-    │   └── progress.py  # Progress tracking
-    ├── database/         # Database models and schema
-    │   ├── models.py    # SQLAlchemy models
-    │   └── schema.sql  # Database schema
-    └── training/         # ML model training
-        ├── train.py     # Model training script
-        └── inference_server.py  # Server-side inference
-```
-
 ## Features
 
 - Real-time ASL alphabet recognition (A-Z)
