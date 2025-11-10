@@ -213,14 +213,17 @@ export function AdaptiveCameraFeed({
         // Run detection asynchronously without blocking
         (async () => {
           try {
-            // Capture current frame
+            // Capture current frame - check video ref again inside async
+            const video = videoRef.current;
+            if (!video) return;
+
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = width;
             tempCanvas.height = height;
             const tempCtx = tempCanvas.getContext('2d');
             if (!tempCtx) return;
 
-            tempCtx.drawImage(videoRef.current, 0, 0, width, height);
+            tempCtx.drawImage(video, 0, 0, width, height);
             const imageDataUrl = tempCanvas.toDataURL('image/jpeg', 0.8);
 
             // Send to server for detection
@@ -245,10 +248,13 @@ export function AdaptiveCameraFeed({
 
             // Callback
             if (onHandDetected) {
-              onHandDetected({
-                image: videoRef.current,
-                ...mediaPipeResults
-              });
+              const video = videoRef.current;
+              if (video) {
+                onHandDetected({
+                  image: video,
+                  ...mediaPipeResults
+                });
+              }
             }
           } else {
             // No hands detected, clear landmarks
