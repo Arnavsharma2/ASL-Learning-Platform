@@ -34,6 +34,8 @@ export default function TimeChallengePage() {
   const streamRef = useRef<MediaStream | null>(null);
   const [modelLoading, setModelLoading] = useState(true);
   const [cameraActive, setCameraActive] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
+  const [cameraError, setCameraError] = useState<string>('');
 
   // Recognition state
   const [detectedSign, setDetectedSign] = useState<string>('');
@@ -120,13 +122,26 @@ export default function TimeChallengePage() {
   // Start challenge
   const startChallenge = async () => {
     generateChallenge();
+    setCameraError('');
+
+    // Start camera first and wait for it to be fully ready
+    if (!cameraActive) {
+      setCameraLoading(true);
+      const success = await initializeCamera();
+      setCameraLoading(false);
+
+      if (!success) {
+        setCameraError('Failed to initialize camera. Please check permissions and try again.');
+        return;
+      }
+
+      // Wait an extra moment for camera to stabilize
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    // Now start countdown
     setMode('countdown');
     setCountdownValue(3);
-
-    // Start camera if not already active
-    if (!cameraActive) {
-      await initializeCamera();
-    }
 
     // Countdown
     const countdownInterval = setInterval(() => {
@@ -147,8 +162,8 @@ export default function TimeChallengePage() {
   };
 
   // Initialize camera
-  const initializeCamera = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+  const initializeCamera = async (): Promise<boolean> => {
+    if (!videoRef.current || !canvasRef.current) return false;
 
     try {
       const hands = await initializeHands(handleHandDetection);
@@ -157,8 +172,11 @@ export default function TimeChallengePage() {
       const stream = await startCamera(videoRef.current, hands);
       streamRef.current = stream;
       setCameraActive(true);
+      return true;
     } catch (err) {
       console.error('Failed to initialize camera:', err);
+      setCameraError(err instanceof Error ? err.message : 'Camera initialization failed');
+      return false;
     }
   };
 
@@ -344,12 +362,18 @@ export default function TimeChallengePage() {
                     </ul>
                   </div>
 
+                  {cameraError && (
+                    <div className="bg-red-900/30 border border-red-800 rounded-lg p-4 text-red-300 text-sm">
+                      {cameraError}
+                    </div>
+                  )}
+
                   <Button
                     onClick={startChallenge}
-                    disabled={modelLoading}
-                    className="w-full py-6 text-lg bg-yellow-600 hover:bg-yellow-700"
+                    disabled={modelLoading || cameraLoading}
+                    className="w-full py-6 text-lg bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {modelLoading ? 'Loading Model...' : 'Start Challenge'}
+                    {cameraLoading ? 'Initializing Camera...' : modelLoading ? 'Loading Model...' : 'Start Challenge'}
                   </Button>
                 </div>
               </Card>
@@ -358,27 +382,14 @@ export default function TimeChallengePage() {
 
           {/* Countdown Mode */}
           {mode === 'countdown' && (
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center">
-                <div className="text-9xl font-bold text-yellow-400 animate-pulse">
-                  {countdownValue}
-                </div>
-                <p className="text-2xl text-gray-400 mt-4">Get Ready!</p>
-              </div>
-            </div>
-          )}
-
-          {/* Challenge Mode */}
-          {mode === 'challenge' && (
             <div className="grid lg:grid-cols-2 gap-6">
-              {/* Left: Camera Feed */}
-              <div>
+              {/* Camera preview during countdown */}
+              <div className="w-full">
                 <Card className="p-4 bg-gray-900/30 border-gray-800">
-                  <div className="relative bg-black rounded-lg overflow-hidden" style={{ width: 640, height: 480 }}>
+                  <div className="relative bg-black rounded-lg overflow-hidden w-full" style={{ aspectRatio: '4/3' }}>
                     <video
                       ref={videoRef}
-                      className="absolute top-0 left-0 opacity-0"
-                      style={{ width: 640, height: 480 }}
+                      className="absolute inset-0 opacity-0 w-full h-full object-cover"
                       playsInline
                       muted
                     />
@@ -386,7 +397,63 @@ export default function TimeChallengePage() {
                       ref={canvasRef}
                       width={640}
                       height={480}
-                      className="absolute top-0 left-0"
+                      className="absolute inset-0 w-full h-full"
+                    />
+                    {/* Countdown overlay */}
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-9xl font-bold text-yellow-400 animate-pulse">
+                          {countdownValue}
+                        </div>
+                        <p className="text-2xl text-gray-400 mt-4">Get Ready!</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Info panel during countdown */}
+              <div className="space-y-4 flex flex-col justify-center">
+                <Card className="p-6 bg-blue-900/20 border-blue-800/50">
+                  <h3 className="text-xl font-semibold mb-3">Challenge Starting Soon</h3>
+                  <div className="space-y-2 text-gray-300">
+                    <p>• {challengeLetters.length} letters to sign</p>
+                    <p>• 80% confidence required</p>
+                    <p>• 15 second timeout per letter</p>
+                    <p>• Camera is ready ✓</p>
+                  </div>
+                </Card>
+
+                <Card className="p-6 bg-gray-900/30 border-gray-800">
+                  <p className="text-sm text-gray-400 mb-2">Quick Tips:</p>
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>• Position your hand clearly in view</li>
+                    <li>• Good lighting helps accuracy</li>
+                    <li>• Sign clearly and hold briefly</li>
+                  </ul>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Challenge Mode */}
+          {mode === 'challenge' && (
+            <div className="grid xl:grid-cols-[1fr,400px] lg:grid-cols-1 gap-6">
+              {/* Left: Camera Feed */}
+              <div className="w-full">
+                <Card className="p-4 bg-gray-900/30 border-gray-800">
+                  <div className="relative bg-black rounded-lg overflow-hidden w-full" style={{ aspectRatio: '4/3' }}>
+                    <video
+                      ref={videoRef}
+                      className="absolute inset-0 opacity-0 w-full h-full object-cover"
+                      playsInline
+                      muted
+                    />
+                    <canvas
+                      ref={canvasRef}
+                      width={640}
+                      height={480}
+                      className="absolute inset-0 w-full h-full"
                     />
 
                     {/* Hint Overlay */}
@@ -413,52 +480,51 @@ export default function TimeChallengePage() {
 
               {/* Right: Challenge Info */}
               <div className="space-y-4">
-                {/* Timer */}
-                <Card className="p-6 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border-yellow-800/50">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-400 flex items-center gap-2">
-                      <Clock className="w-4 h-4" />
-                      Elapsed Time
-                    </span>
-                  </div>
-                  <div className="text-5xl font-bold text-yellow-400 font-mono">
-                    {formatTime(elapsedTime)}
-                  </div>
-                </Card>
-
-                {/* Progress */}
-                <Card className="p-6 bg-gray-900/30 border-gray-800">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-400">Progress</span>
-                    <Badge variant="outline">{currentLetterIndex + 1} / {challengeLetters.length}</Badge>
-                  </div>
-                  <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-300"
-                      style={{ width: `${((currentLetterIndex + 1) / challengeLetters.length) * 100}%` }}
-                    />
-                  </div>
-                </Card>
-
-                {/* Target Letter */}
+                {/* Target Letter - Make this the most prominent */}
                 <Card className="p-8 bg-gradient-to-br from-blue-900/40 to-purple-900/40 border-blue-800/50 text-center">
-                  <p className="text-sm text-gray-400 mb-2">Sign This Letter:</p>
-                  <div className="text-9xl font-bold text-white mb-4">
+                  <p className="text-sm text-gray-400 mb-2">Sign This Letter</p>
+                  <div className="text-8xl font-bold text-white my-4">
                     {challengeLetters[currentLetterIndex]}
                   </div>
-                  <div className="text-sm text-gray-500">
-                    Letter {currentLetterIndex + 1} of {challengeLetters.length}
+                  <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+                    <span>Letter {currentLetterIndex + 1} of {challengeLetters.length}</span>
+                  </div>
+                </Card>
+
+                {/* Timer and Progress in one card */}
+                <Card className="p-4 bg-gray-900/30 border-gray-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs text-gray-400 flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Time
+                    </span>
+                    <div className="text-2xl font-bold text-yellow-400 font-mono">
+                      {formatTime(elapsedTime)}
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-800 pt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gray-400">Progress</span>
+                      <Badge variant="outline" className="text-xs">{currentLetterIndex + 1} / {challengeLetters.length}</Badge>
+                    </div>
+                    <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-300"
+                        style={{ width: `${((currentLetterIndex + 1) / challengeLetters.length) * 100}%` }}
+                      />
+                    </div>
                   </div>
                 </Card>
 
                 {/* Detection Status */}
                 <Card className="p-4 bg-gray-900/30 border-gray-800">
-                  <p className="text-sm text-gray-400 mb-2">Current Detection:</p>
+                  <p className="text-xs text-gray-400 mb-3">Current Detection</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold">{detectedSign || '—'}</span>
+                    <span className="text-3xl font-bold">{detectedSign || '—'}</span>
                     <Badge
                       variant={confidence >= 0.80 ? "default" : "secondary"}
-                      className={confidence >= 0.80 ? "bg-green-600" : ""}
+                      className={confidence >= 0.80 ? "bg-green-600 text-lg px-3 py-1" : "text-lg px-3 py-1"}
                     >
                       {(confidence * 100).toFixed(0)}%
                     </Badge>

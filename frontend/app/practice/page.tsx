@@ -39,9 +39,9 @@ function PracticePageContent() {
   const [sessionCount, setSessionCount] = useState(0);
   const isProcessingRef = useRef<boolean>(false);
 
-  // Performance optimization: throttle inference to max 2-3 FPS (300-500ms between calls)
-  // SageMaker is fast, but we don't need to call it more than a few times per second
-  const INFERENCE_THROTTLE_MS = 500;
+  // Performance optimization: throttle inference to ~5 FPS (200ms between calls)
+  // This provides a good balance between responsiveness and performance
+  const INFERENCE_THROTTLE_MS = 200;
   const [modelLoading, setModelLoading] = useState(true);
   const [modelError, setModelError] = useState<string | null>(null);
 
@@ -115,11 +115,13 @@ function PracticePageContent() {
 
       // Skip if already processing to prevent concurrent runs
       if (isProcessingRef.current) {
+        console.log('Skipping - still processing previous frame');
         return; // Skip this frame
       }
 
       lastInferenceRef.current = now;
       isProcessingRef.current = true;
+      console.log('Starting inference...');
 
       // Performance monitoring: track FPS
       frameCountRef.current++;
@@ -202,6 +204,7 @@ function PracticePageContent() {
         setConfidence(0);
       } finally {
         isProcessingRef.current = false;
+        console.log('Inference complete, ready for next frame');
       }
     } else {
       setDetectedSign(null);
