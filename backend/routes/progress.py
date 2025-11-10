@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, text
 from typing import List
 
 from database.models import (
@@ -87,33 +87,44 @@ async def get_user_sessions(
 
 @router.get("/stats/{user_id}")
 async def get_user_stats(user_id: str, db: Session = Depends(get_db)):
-    """Get aggregate statistics for a user"""
-    # Total attempts
-    total_attempts = db.query(func.count(PracticeSession.id)).filter(
-        PracticeSession.user_id == user_id
-    ).scalar()
-
-    # Average accuracy
-    avg_accuracy = db.query(func.avg(UserProgress.accuracy)).filter(
-        UserProgress.user_id == user_id
-    ).scalar()
-
-    # Total lessons practiced
-    lessons_practiced = db.query(func.count(UserProgress.id)).filter(
-        UserProgress.user_id == user_id
-    ).scalar()
-
-    # Correct attempts
-    correct_attempts = db.query(func.count(PracticeSession.id)).filter(
-        PracticeSession.user_id == user_id,
-        PracticeSession.is_correct == 1
-    ).scalar()
-
+    """Get aggregate statistics for a user - uses single query for transaction pooler compatibility"""
+    # Use a single combined query with subqueries to work with Supabase transaction pooler
+    # This avoids multiple prepared statements which aren't supported by transaction pooler
+    result = db.execute(
+        text("""
+            SELECT 
+                (SELECT COALESCE(COUNT(id), 0) 
+                 FROM public.practice_sessions 
+                 WHERE user_id = :user_id) as total_attempts,
+                (SELECT COALESCE(COUNT(id), 0) 
+                 FROM public.practice_sessions 
+                 WHERE user_id = :user_id AND is_correct = 1) as correct_attempts,
+                (SELECT COALESCE(AVG(accuracy), 0) 
+                 FROM public.user_progress 
+                 WHERE user_id = :user_id) as avg_lesson_accuracy,
+                (SELECT COALESCE(COUNT(id), 0) 
+                 FROM public.user_progress 
+                 WHERE user_id = :user_id) as lessons_practiced
+        """),
+        {"user_id": user_id}
+    ).first()
+    
+    if result:
+        total_attempts = result.total_attempts or 0
+        correct_attempts = result.correct_attempts or 0
+        avg_accuracy = float(result.avg_lesson_accuracy) if result.avg_lesson_accuracy else 0
+        lessons_practiced = result.lessons_practiced or 0
+    else:
+        total_attempts = 0
+        correct_attempts = 0
+        avg_accuracy = 0
+        lessons_practiced = 0
+    
     return {
         "user_id": user_id,
-        "total_attempts": total_attempts or 0,
-        "correct_attempts": correct_attempts or 0,
-        "accuracy_rate": (correct_attempts / total_attempts * 100) if total_attempts else 0,
-        "avg_lesson_accuracy": float(avg_accuracy) if avg_accuracy else 0,
-        "lessons_practiced": lessons_practiced or 0
+        "total_attempts": total_attempts,
+        "correct_attempts": correct_attempts,
+        "accuracy_rate": (correct_attempts / total_attempts * 100) if total_attempts > 0 else 0,
+        "avg_lesson_accuracy": avg_accuracy,
+        "lessons_practiced": lessons_practiced
     }

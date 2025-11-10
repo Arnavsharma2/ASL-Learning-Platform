@@ -27,7 +27,16 @@ SessionLocal = None
 
 if DATABASE_URL:
     try:
-        engine = create_engine(DATABASE_URL)
+        # Configure engine for Supabase transaction pooler compatibility
+        # Transaction pooler (port 6543) doesn't support prepared statements
+        # Using connect_args to ensure compatibility
+        engine = create_engine(
+            DATABASE_URL,
+            pool_pre_ping=True,  # Verify connections before using
+            connect_args={
+                "options": "-c statement_timeout=30000"  # 30 second timeout
+            }
+        )
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     except Exception as e:
         print(f"Warning: Could not connect to database: {e}")
