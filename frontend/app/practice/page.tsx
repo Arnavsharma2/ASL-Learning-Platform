@@ -96,19 +96,16 @@ function PracticePageContent() {
         return;
       }
 
-      // Use settings-based throttle (server mode = 0, skip inference)
+      // Use settings-based throttle
       const throttleMs = settings.inferenceThrottleMs;
 
-      // Skip inference completely in server mode (throttle = 0)
-      if (throttleMs === 0) {
-        setDetectedSign('Server mode - snapshots only');
-        setConfidence(0);
-        return;
-      }
-
-      // Throttle inference calls based on settings
+      // In server mode (throttle = 0), the server handles detection at its own pace
+      // We still need to run inference on the landmarks returned by the server
+      // So we don't skip - we just don't throttle
       const now = Date.now();
-      if (now - lastInferenceRef.current < throttleMs || isProcessingRef.current) {
+
+      // Only throttle if not in server mode
+      if (throttleMs > 0 && (now - lastInferenceRef.current < throttleMs || isProcessingRef.current)) {
         return; // Skip this frame
       }
 

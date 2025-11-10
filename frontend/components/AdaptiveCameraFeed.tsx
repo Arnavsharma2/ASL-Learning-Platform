@@ -26,10 +26,12 @@ export function AdaptiveCameraFeed({
   const [isActive, setIsActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [handsDetected, setHandsDetected] = useState(0);
+  const [serverError, setServerError] = useState(false);
   const handsRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const lastHandCountRef = useRef<number>(0);
   const serverIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const serverErrorCountRef = useRef<number>(0);
 
   const isServerMode = settings.mode === 'max_performance';
 
@@ -191,9 +193,13 @@ export function AdaptiveCameraFeed({
           }
         } catch (err: any) {
           console.error('Server frame processing error:', err);
-          // If server is unavailable, show helpful error
-          if (err?.message?.includes('Failed to fetch') || err?.message?.includes('NetworkError')) {
+          serverErrorCountRef.current += 1;
+
+          // If server is unavailable, show helpful error after 3 failed attempts
+          if (serverErrorCountRef.current >= 3 && !serverError) {
+            setServerError(true);
             console.warn('Server unavailable - hand detection requires backend with OpenCV/MediaPipe');
+            console.warn('Falling back to client-side mode recommended');
           }
         }
       };
@@ -343,6 +349,16 @@ export function AdaptiveCameraFeed({
               <div className="text-center">
                 <p className="font-semibold mb-2">Camera Error</p>
                 <p className="text-sm">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Server error warning */}
+          {serverError && !error && (
+            <div className="absolute bottom-0 left-0 right-0 bg-yellow-900 bg-opacity-90 text-white p-3">
+              <div className="text-center">
+                <p className="font-semibold text-sm mb-1">⚠️ Server Unavailable</p>
+                <p className="text-xs">Hand detection server is not responding. Switch to Balanced or Max Accuracy mode in Settings.</p>
               </div>
             </div>
           )}
