@@ -350,7 +350,8 @@ export function AdaptiveCameraFeed({
         handsRef.current = null;
       }
     };
-  }, [isActive, isServerMode, initializeClientMode, initializeServerMode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, isServerMode]); // Only restart on camera toggle or mode change
 
   const toggleCamera = () => {
     setIsActive(!isActive);

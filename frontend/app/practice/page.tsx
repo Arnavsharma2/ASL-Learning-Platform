@@ -39,8 +39,9 @@ function PracticePageContent() {
   const [sessionCount, setSessionCount] = useState(0);
   const isProcessingRef = useRef<boolean>(false);
 
-  // Performance optimization: throttle inference to max 10 FPS (100ms between calls)
-  const INFERENCE_THROTTLE_MS = 100;
+  // Performance optimization: throttle inference to max 2-3 FPS (300-500ms between calls)
+  // SageMaker is fast, but we don't need to call it more than a few times per second
+  const INFERENCE_THROTTLE_MS = 500;
   const [modelLoading, setModelLoading] = useState(true);
   const [modelError, setModelError] = useState<string | null>(null);
 

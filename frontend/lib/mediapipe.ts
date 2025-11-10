@@ -110,9 +110,9 @@ export async function startCamera(
     checkReady();
   });
 
-  // Performance optimization: limit MediaPipe to ~20 FPS (50ms between frames)
-  // This prevents overwhelming the GPU/CPU while still feeling responsive
-  const FRAME_THROTTLE_MS = 50;
+  // Performance optimization: limit MediaPipe to ~10 FPS (100ms between frames)
+  // Since we're using SageMaker for inference, we don't need super high frame rate
+  const FRAME_THROTTLE_MS = 100;
   let isProcessing = false;
   let animationFrameId: number | null = null;
   let shouldContinue = true;
