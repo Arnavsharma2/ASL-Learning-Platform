@@ -98,14 +98,14 @@ function PracticePageContent() {
 
       // Use settings-based throttle
       const throttleMs = settings.inferenceThrottleMs;
-
-      // In server mode (throttle = 0), the server handles detection at its own pace
-      // We still need to run inference on the landmarks returned by the server
-      // So we don't skip - we just don't throttle
       const now = Date.now();
 
-      // Only throttle if not in server mode
-      if (throttleMs > 0 && (now - lastInferenceRef.current < throttleMs || isProcessingRef.current)) {
+      // In server mode (throttle = 0), still apply a minimum 1000ms throttle for ONNX inference
+      // Server already throttles detection to every 2s, but we don't want to run inference on every callback
+      const effectiveThrottle = throttleMs === 0 ? 1000 : throttleMs;
+
+      // Throttle based on time and processing state
+      if (now - lastInferenceRef.current < effectiveThrottle || isProcessingRef.current) {
         return; // Skip this frame
       }
 

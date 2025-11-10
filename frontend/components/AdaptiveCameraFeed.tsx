@@ -9,6 +9,62 @@ import { Badge } from '@/components/ui/badge';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Zap, Wifi, WifiOff } from 'lucide-react';
 
+// Hand connection lines (MediaPipe hand model)
+const HAND_CONNECTIONS = [
+  [0, 1], [1, 2], [2, 3], [3, 4],  // Thumb
+  [0, 5], [5, 6], [6, 7], [7, 8],  // Index
+  [0, 9], [9, 10], [10, 11], [11, 12],  // Middle
+  [0, 13], [13, 14], [14, 15], [15, 16],  // Ring
+  [0, 17], [17, 18], [18, 19], [19, 20],  // Pinky
+  [5, 9], [9, 13], [13, 17],  // Palm
+];
+
+// Helper function to draw connectors
+function drawConnectors(
+  ctx: CanvasRenderingContext2D,
+  landmarks: any[],
+  connections: number[][]
+) {
+  const canvasWidth = ctx.canvas.width;
+  const canvasHeight = ctx.canvas.height;
+
+  ctx.strokeStyle = '#00FF00';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  ctx.beginPath();
+  for (const [start, end] of connections) {
+    const startLandmark = landmarks[start];
+    const endLandmark = landmarks[end];
+    ctx.moveTo(startLandmark.x * canvasWidth, startLandmark.y * canvasHeight);
+    ctx.lineTo(endLandmark.x * canvasWidth, endLandmark.y * canvasHeight);
+  }
+  ctx.stroke();
+}
+
+// Helper function to draw landmarks only (no clear, no video redraw)
+function drawLandmarksOnly(
+  ctx: CanvasRenderingContext2D,
+  landmarks: any[],
+  width: number,
+  height: number
+) {
+  ctx.fillStyle = '#FF0000';
+
+  for (const landmark of landmarks) {
+    ctx.beginPath();
+    ctx.arc(
+      landmark.x * width,
+      landmark.y * height,
+      5,
+      0,
+      2 * Math.PI
+    );
+    ctx.fill();
+  }
+}
+
 interface AdaptiveCameraFeedProps {
   onHandDetected?: (results: MediaPipeResults) => void;
   width?: number;
@@ -113,18 +169,29 @@ export function AdaptiveCameraFeed({
 
       streamRef.current = stream;
 
-      // Draw video continuously on canvas (60 FPS)
+      // Draw video continuously on canvas (throttled to 30 FPS for performance)
       let animationFrameId: number | null = null;
+      let lastDrawTime = 0;
+      const targetFPS = 30;
+      const frameInterval = 1000 / targetFPS;
+
       const drawVideoFrame = () => {
         if (!videoRef.current || !canvasRef.current) {
           if (animationFrameId) cancelAnimationFrame(animationFrameId);
           return;
         }
 
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(videoRef.current, 0, 0, width, height);
+        const now = performance.now();
+        const elapsed = now - lastDrawTime;
+
+        // Only draw if enough time has passed (throttle to 30 FPS)
+        if (elapsed >= frameInterval) {
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(videoRef.current, 0, 0, width, height);
+          }
+          lastDrawTime = now;
         }
 
         animationFrameId = requestAnimationFrame(drawVideoFrame);
@@ -164,7 +231,7 @@ export function AdaptiveCameraFeed({
             setHandsDetected(currentHandCount);
           }
 
-          // If server returns landmarks, draw them
+          // If server returns landmarks, draw them ON TOP of the continuously updating video
           if (response && response.hand_count > 0) {
             // Convert to MediaPipe format
             const mediaPipeResults = convertServerLandmarksToMediaPipe(response.landmarks);
@@ -175,12 +242,13 @@ export function AdaptiveCameraFeed({
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
 
-            // Draw landmarks on top of video
+            // Draw landmarks ONLY (don't clear canvas, video is already being drawn continuously)
             if (mediaPipeResults.multiHandLandmarks?.length > 0) {
-              drawHands(ctx, {
-                image: videoRef.current,
-                ...mediaPipeResults
-              }, width, height);
+              // Draw connections
+              for (const landmarks of mediaPipeResults.multiHandLandmarks) {
+                drawConnectors(ctx, landmarks, HAND_CONNECTIONS);
+                drawLandmarksOnly(ctx, landmarks, width, height);
+              }
             }
 
             // Callback
