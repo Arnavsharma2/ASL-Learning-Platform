@@ -41,6 +41,10 @@ export function Navigation() {
               Quiz
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-white/50 transition-all duration-300 group-hover:w-full" />
             </Link>
+            <Link href="/time-challenge" className="text-sm hover:text-gray-400 transition-all relative group">
+              Time Challenge
+              <span className="absolute -bottom-1 left-0 w-0 h-px bg-white/50 transition-all duration-300 group-hover:w-full" />
+            </Link>
             <Link href="/reference" className="text-sm hover:text-gray-400 transition-all relative group">
               Reference
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-white/50 transition-all duration-300 group-hover:w-full" />
