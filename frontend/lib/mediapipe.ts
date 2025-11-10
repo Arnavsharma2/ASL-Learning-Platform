@@ -83,15 +83,12 @@ export async function startCamera(
   videoElement.srcObject = stream;
   await videoElement.play();
 
-  // Throttle frame processing to ~30fps to reduce lag when hands enter/exit
-  let lastFrameTime = 0;
-  const targetFPS = 30;
-  const frameInterval = 1000 / targetFPS;
+  // Process frames as fast as possible - no throttling
   let isProcessing = false;
   let animationFrameId: number | null = null;
   let shouldContinue = true;
 
-  // Process frames with throttling
+  // Process frames at maximum speed
   const sendFrame = () => {
     // Check if still active and video is playing
     if (!videoElement.srcObject || !shouldContinue) {
@@ -102,14 +99,10 @@ export async function startCamera(
       return;
     }
 
-    const now = performance.now();
-    const elapsed = now - lastFrameTime;
-
-    // Only process if enough time has passed and not already processing
-    if (elapsed >= frameInterval && !isProcessing) {
+    // Process frame if not already processing
+    if (!isProcessing) {
       isProcessing = true;
-      lastFrameTime = now;
-      
+
       // Process frame asynchronously
       hands.send({ image: videoElement })
         .catch((error: any) => {
@@ -117,8 +110,8 @@ export async function startCamera(
           // Stop processing on resource/loading errors to prevent infinite loop
           const errorMsg = error?.message || error?.toString() || '';
           if (
-            errorMsg.includes('resource') || 
-            errorMsg.includes('wasm') || 
+            errorMsg.includes('resource') ||
+            errorMsg.includes('wasm') ||
             errorMsg.includes('emscripten') ||
             errorMsg.includes('not found') ||
             errorMsg.includes('Failed to fetch')
@@ -142,8 +135,7 @@ export async function startCamera(
         });
     }
 
-    // Continue the loop - requestAnimationFrame naturally throttles to ~60fps
-    // Our frameInterval check ensures we only process at 30fps
+    // Continue the loop at maximum speed
     if (shouldContinue) {
       animationFrameId = requestAnimationFrame(sendFrame);
     }

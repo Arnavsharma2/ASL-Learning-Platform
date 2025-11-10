@@ -96,21 +96,13 @@ function PracticePageContent() {
         return;
       }
 
-      // Use settings-based throttle
-      const throttleMs = settings.inferenceThrottleMs;
-      const now = Date.now();
-
-      // In server mode (throttle = 0), still apply a minimum 1000ms throttle for ONNX inference
-      // Server already throttles detection to every 2s, but we don't want to run inference on every callback
-      const effectiveThrottle = throttleMs === 0 ? 1000 : throttleMs;
-
-      // Throttle based on time and processing state
-      if (now - lastInferenceRef.current < effectiveThrottle || isProcessingRef.current) {
+      // No throttling - run inference as fast as possible
+      // Only skip if already processing to prevent concurrent runs
+      if (isProcessingRef.current) {
         return; // Skip this frame
       }
 
       isProcessingRef.current = true;
-      lastInferenceRef.current = now;
 
       try {
         // Extract landmarks from first detected hand

@@ -88,6 +88,7 @@ export function AdaptiveCameraFeed({
   const lastHandCountRef = useRef<number>(0);
   const serverIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const serverErrorCountRef = useRef<number>(0);
+  const currentLandmarksRef = useRef<any[] | null>(null); // Store current landmarks for continuous drawing
 
   const isServerMode = settings.mode === 'max_performance';
 
@@ -169,11 +170,8 @@ export function AdaptiveCameraFeed({
 
       streamRef.current = stream;
 
-      // Draw video continuously on canvas (throttled to 30 FPS for performance)
+      // Draw video continuously on canvas (maximum speed - no throttling)
       let animationFrameId: number | null = null;
-      let lastDrawTime = 0;
-      const targetFPS = 30;
-      const frameInterval = 1000 / targetFPS;
 
       const drawVideoFrame = () => {
         if (!videoRef.current || !canvasRef.current) {
@@ -181,17 +179,19 @@ export function AdaptiveCameraFeed({
           return;
         }
 
-        const now = performance.now();
-        const elapsed = now - lastDrawTime;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Draw video frame
+          ctx.drawImage(videoRef.current, 0, 0, width, height);
 
-        // Only draw if enough time has passed (throttle to 30 FPS)
-        if (elapsed >= frameInterval) {
-          const canvas = canvasRef.current;
-          const ctx = canvas.getContext('2d');
-          if (ctx) {
-            ctx.drawImage(videoRef.current, 0, 0, width, height);
+          // Draw landmarks on top if we have them
+          if (currentLandmarksRef.current && currentLandmarksRef.current.length > 0) {
+            for (const landmarks of currentLandmarksRef.current) {
+              drawConnectors(ctx, landmarks, HAND_CONNECTIONS);
+              drawLandmarksOnly(ctx, landmarks, width, height);
+            }
           }
-          lastDrawTime = now;
         }
 
         animationFrameId = requestAnimationFrame(drawVideoFrame);
@@ -207,22 +207,24 @@ export function AdaptiveCameraFeed({
       };
 
       // Process frames periodically (like the other repo - every few seconds)
-      const processServerFrame = async () => {
+      const processServerFrame = () => {
         if (!videoRef.current || !canvasRef.current) return;
 
-        try {
-          // Capture current frame
-          const tempCanvas = document.createElement('canvas');
-          tempCanvas.width = width;
-          tempCanvas.height = height;
-          const tempCtx = tempCanvas.getContext('2d');
-          if (!tempCtx) return;
+        // Run detection asynchronously without blocking
+        (async () => {
+          try {
+            // Capture current frame
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            const tempCtx = tempCanvas.getContext('2d');
+            if (!tempCtx) return;
 
-          tempCtx.drawImage(videoRef.current, 0, 0, width, height);
-          const imageDataUrl = tempCanvas.toDataURL('image/jpeg', 0.8);
+            tempCtx.drawImage(videoRef.current, 0, 0, width, height);
+            const imageDataUrl = tempCanvas.toDataURL('image/jpeg', 0.8);
 
-          // Send to server for detection
-          const response = await detectHandsOnServer(imageDataUrl, false);
+            // Send to server for detection
+            const response = await detectHandsOnServer(imageDataUrl, false);
 
           // Update hand count
           const currentHandCount = response?.hand_count || 0;
@@ -231,24 +233,14 @@ export function AdaptiveCameraFeed({
             setHandsDetected(currentHandCount);
           }
 
-          // If server returns landmarks, draw them ON TOP of the continuously updating video
+          // If server returns landmarks, store them for continuous drawing
           if (response && response.hand_count > 0) {
             // Convert to MediaPipe format
             const mediaPipeResults = convertServerLandmarksToMediaPipe(response.landmarks);
 
-            // Get canvas context
-            const canvas = canvasRef.current;
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-
-            // Draw landmarks ONLY (don't clear canvas, video is already being drawn continuously)
+            // Store landmarks for the drawing loop to use
             if (mediaPipeResults.multiHandLandmarks?.length > 0) {
-              // Draw connections
-              for (const landmarks of mediaPipeResults.multiHandLandmarks) {
-                drawConnectors(ctx, landmarks, HAND_CONNECTIONS);
-                drawLandmarksOnly(ctx, landmarks, width, height);
-              }
+              currentLandmarksRef.current = mediaPipeResults.multiHandLandmarks;
             }
 
             // Callback
@@ -258,18 +250,22 @@ export function AdaptiveCameraFeed({
                 ...mediaPipeResults
               });
             }
+          } else {
+            // No hands detected, clear landmarks
+            currentLandmarksRef.current = null;
           }
-        } catch (err: any) {
-          console.error('Server frame processing error:', err);
-          serverErrorCountRef.current += 1;
+          } catch (err: any) {
+            console.error('Server frame processing error:', err);
+            serverErrorCountRef.current += 1;
 
-          // If server is unavailable, show helpful error after 3 failed attempts
-          if (serverErrorCountRef.current >= 3 && !serverError) {
-            setServerError(true);
-            console.warn('Server unavailable - hand detection requires backend with OpenCV/MediaPipe');
-            console.warn('Falling back to client-side mode recommended');
+            // If server is unavailable, show helpful error after 3 failed attempts
+            if (serverErrorCountRef.current >= 3 && !serverError) {
+              setServerError(true);
+              console.warn('Server unavailable - hand detection requires backend with OpenCV/MediaPipe');
+              console.warn('Falling back to client-side mode recommended');
+            }
           }
-        }
+        })(); // Execute async immediately
       };
 
       // Process every 2 seconds for smoothness (more frequent than the 10s in the other repo)
