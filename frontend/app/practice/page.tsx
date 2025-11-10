@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSettings } from '@/contexts/SettingsContext';
 import { MediaPipeResults, HandLandmarks } from '@/lib/mediapipe';
-import { CameraFeed } from '@/components/CameraFeed';
+import { AdaptiveCameraFeed } from '@/components/AdaptiveCameraFeed';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,6 +24,7 @@ interface Lesson {
 
 function PracticePageContent() {
   const { user } = useAuth();
+  const { settings } = useSettings();
   const searchParams = useSearchParams();
   const router = useRouter();
   const lessonId = searchParams?.get('lesson');
@@ -94,9 +96,19 @@ function PracticePageContent() {
         return;
       }
 
-      // Throttle inference calls to max once per 200ms to prevent performance issues
+      // Use settings-based throttle (server mode = 0, skip inference)
+      const throttleMs = settings.inferenceThrottleMs;
+
+      // Skip inference completely in server mode (throttle = 0)
+      if (throttleMs === 0) {
+        setDetectedSign('Server mode - snapshots only');
+        setConfidence(0);
+        return;
+      }
+
+      // Throttle inference calls based on settings
       const now = Date.now();
-      if (now - lastInferenceRef.current < 200 || isProcessingRef.current) {
+      if (now - lastInferenceRef.current < throttleMs || isProcessingRef.current) {
         return; // Skip this frame
       }
 
@@ -282,7 +294,7 @@ function PracticePageContent() {
                 </Card>
               ) : (
                 <>
-                  <CameraFeed
+                  <AdaptiveCameraFeed
                     onHandDetected={handleHandDetection}
                     width={640}
                     height={480}

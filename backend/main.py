@@ -8,12 +8,20 @@ load_dotenv()
 
 # Import routes (will show warnings if DB not configured, but won't crash)
 try:
-    from routes import lessons, progress
+    from routes import lessons, progress, hand_detection
     routes_available = True
 except Exception as e:
     print(f"Warning: Could not load routes: {e}")
     print("API will run in limited mode. Configure Supabase to enable all endpoints.")
     routes_available = False
+
+# Always import hand_detection (doesn't require DB)
+try:
+    from routes import hand_detection
+    hand_detection_available = True
+except Exception as e:
+    print(f"Warning: Could not load hand_detection route: {e}")
+    hand_detection_available = False
 
 app = FastAPI(
     title="ASL Learning API",
@@ -46,6 +54,10 @@ app.add_middleware(
 if routes_available:
     app.include_router(lessons.router, prefix="/api/lessons", tags=["lessons"])
     app.include_router(progress.router, prefix="/api/progress", tags=["progress"])
+
+# Include hand detection router (works without DB)
+if hand_detection_available:
+    app.include_router(hand_detection.router, prefix="/api/hand-detection", tags=["hand-detection"])
 
 
 @app.get("/")

@@ -1,0 +1,298 @@
+'use client';
+
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { initializeHands, startCamera, drawHands, MediaPipeResults } from '@/lib/mediapipe';
+import { detectHandsOnServer, convertServerLandmarksToMediaPipe } from '@/lib/serverHandDetection';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useSettings } from '@/contexts/SettingsContext';
+import { Zap, Wifi, WifiOff } from 'lucide-react';
+
+interface AdaptiveCameraFeedProps {
+  onHandDetected?: (results: MediaPipeResults) => void;
+  width?: number;
+  height?: number;
+}
+
+export function AdaptiveCameraFeed({
+  onHandDetected,
+  width = 640,
+  height = 480
+}: AdaptiveCameraFeedProps) {
+  const { settings } = useSettings();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isActive, setIsActive] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [handsDetected, setHandsDetected] = useState(0);
+  const handsRef = useRef<any>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const lastHandCountRef = useRef<number>(0);
+  const serverIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const isServerMode = settings.mode === 'max_performance';
+
+  // Client-side real-time processing
+  const initializeClientMode = useCallback(async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    try {
+      // Initialize MediaPipe Hands
+      const hands = await initializeHands((results: MediaPipeResults) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Draw the hands on canvas
+        drawHands(ctx, results, width, height);
+
+        // Update hand count
+        const currentHandCount = results.multiHandLandmarks?.length || 0;
+        if (currentHandCount !== lastHandCountRef.current) {
+          lastHandCountRef.current = currentHandCount;
+          setHandsDetected(currentHandCount);
+        }
+
+        // Callback for hand detection
+        if (onHandDetected && results.multiHandLandmarks) {
+          onHandDetected(results);
+        }
+      });
+
+      handsRef.current = hands;
+
+      // Start camera
+      const stream = await startCamera(videoRef.current, hands);
+      streamRef.current = stream;
+      setError(null);
+    } catch (err: any) {
+      console.error('Error initializing client mode:', err);
+      setError('Failed to access camera or load MediaPipe');
+      setIsActive(false);
+    }
+  }, [width, height, onHandDetected]);
+
+  // Server-side snapshot processing
+  const initializeServerMode = useCallback(async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    try {
+      // Just start the camera without MediaPipe
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width, height },
+      });
+
+      videoRef.current.srcObject = stream;
+      videoRef.current.playsInline = true;
+      videoRef.current.muted = true;
+      await videoRef.current.play();
+      streamRef.current = stream;
+
+      // Process frames periodically (like the other repo - every few seconds)
+      const processServerFrame = async () => {
+        if (!videoRef.current || !canvasRef.current) return;
+
+        try {
+          // Capture current frame
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = width;
+          tempCanvas.height = height;
+          const tempCtx = tempCanvas.getContext('2d');
+          if (!tempCtx) return;
+
+          tempCtx.drawImage(videoRef.current, 0, 0, width, height);
+          const imageDataUrl = tempCanvas.toDataURL('image/jpeg', 0.8);
+
+          // Send to server for detection
+          const response = await detectHandsOnServer(imageDataUrl, false);
+
+          // Convert to MediaPipe format and trigger callback
+          const mediaPipeResults = convertServerLandmarksToMediaPipe(response.landmarks);
+
+          // Draw on canvas
+          const canvas = canvasRef.current;
+          if (!canvas) return;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+
+          // Clear and draw video frame
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(videoRef.current, 0, 0, width, height);
+
+          // Draw landmarks if detected
+          if (mediaPipeResults.multiHandLandmarks?.length > 0) {
+            drawHands(ctx, {
+              image: videoRef.current,
+              ...mediaPipeResults
+            }, width, height);
+          }
+
+          // Update hand count
+          const currentHandCount = response.hand_count;
+          if (currentHandCount !== lastHandCountRef.current) {
+            lastHandCountRef.current = currentHandCount;
+            setHandsDetected(currentHandCount);
+          }
+
+          // Callback
+          if (onHandDetected && response.landmarks.length > 0) {
+            onHandDetected({
+              image: videoRef.current,
+              ...mediaPipeResults
+            });
+          }
+        } catch (err) {
+          console.error('Server frame processing error:', err);
+        }
+      };
+
+      // Process every 2 seconds for smoothness (more frequent than the 10s in the other repo)
+      serverIntervalRef.current = setInterval(processServerFrame, 2000);
+      setError(null);
+    } catch (err: any) {
+      console.error('Error initializing server mode:', err);
+      setError('Failed to access camera');
+      setIsActive(false);
+    }
+  }, [width, height, onHandDetected]);
+
+  // Initialize based on mode
+  useEffect(() => {
+    if (!isActive) return;
+
+    let isMounted = true;
+
+    const initialize = async () => {
+      if (isServerMode) {
+        await initializeServerMode();
+      } else {
+        await initializeClientMode();
+      }
+    };
+
+    initialize();
+
+    return () => {
+      // Cleanup
+      isMounted = false;
+
+      // Stop server interval
+      if (serverIntervalRef.current) {
+        clearInterval(serverIntervalRef.current);
+        serverIntervalRef.current = null;
+      }
+
+      // Stop frame processing
+      if (videoRef.current && (videoRef.current as any).__stopFrameProcessing) {
+        (videoRef.current as any).__stopFrameProcessing();
+      }
+
+      // Stop camera stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+
+      // Close MediaPipe
+      if (handsRef.current) {
+        try {
+          handsRef.current.close();
+        } catch (e) {
+          // Ignore
+        }
+        handsRef.current = null;
+      }
+    };
+  }, [isActive, isServerMode, initializeClientMode, initializeServerMode]);
+
+  const toggleCamera = () => {
+    setIsActive(!isActive);
+  };
+
+  return (
+    <Card className="p-4">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Camera Feed</h3>
+          <div className="flex items-center gap-2">
+            {isActive && (
+              <>
+                <Badge variant={handsDetected > 0 ? "default" : "secondary"}>
+                  {handsDetected} {handsDetected === 1 ? 'hand' : 'hands'} detected
+                </Badge>
+                <Badge variant="outline" className="gap-1">
+                  {isServerMode ? (
+                    <>
+                      <Wifi className="w-3 h-3" />
+                      Server Mode
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-3 h-3" />
+                      Client Mode
+                    </>
+                  )}
+                </Badge>
+              </>
+            )}
+            <Button onClick={toggleCamera} variant={isActive ? "destructive" : "default"}>
+              {isActive ? 'Stop Camera' : 'Start Camera'}
+            </Button>
+          </div>
+        </div>
+
+        <div className="relative bg-black rounded-lg overflow-hidden" style={{ width, height }}>
+          {/* Video element */}
+          <video
+            ref={videoRef}
+            className={`absolute top-0 left-0 ${isServerMode ? '' : 'opacity-0'}`}
+            style={{ width, height }}
+            playsInline
+            muted
+          />
+
+          {/* Canvas for drawing hand landmarks */}
+          <canvas
+            ref={canvasRef}
+            width={width}
+            height={height}
+            className="absolute top-0 left-0"
+          />
+
+          {/* Placeholder when camera is off */}
+          {!isActive && (
+            <div className="absolute inset-0 flex items-center justify-center text-white">
+              <div className="text-center">
+                <p className="text-lg mb-2">Camera is off</p>
+                <p className="text-sm text-gray-400">Click "Start Camera" to begin</p>
+              </div>
+            </div>
+          )}
+
+          {/* Error message */}
+          {error && (
+            <div className="absolute inset-0 flex items-center justify-center bg-red-900 bg-opacity-90 text-white p-4">
+              <div className="text-center">
+                <p className="font-semibold mb-2">Camera Error</p>
+                <p className="text-sm">{error}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {isActive && (
+          <div className="text-sm text-gray-600">
+            <p>
+              {isServerMode
+                ? 'Using server-side processing for maximum smoothness (snapshots every 2 seconds)'
+                : 'Using client-side real-time tracking for maximum accuracy'}
+            </p>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}

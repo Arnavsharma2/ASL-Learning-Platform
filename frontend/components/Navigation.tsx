@@ -37,6 +37,9 @@ export function Navigation() {
             <Link href="/reference">
               <Button variant="outline">Reference</Button>
             </Link>
+            <Link href="/settings">
+              <Button variant="outline">Settings</Button>
+            </Link>
             {!loading && (
               <>
                 {user ? (
