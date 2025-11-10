@@ -239,25 +239,52 @@ export default function Home() {
                   {/* Loss Chart */}
                   <Card className="p-6 bg-gray-900 border-gray-800">
                     <h3 className="text-xl font-normal mb-6 text-gray-300">Training & Validation Loss</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <ResponsiveContainer width="100%" height={350}>
+                      <LineChart 
+                        data={chartData} 
+                        margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                      >
                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                         <XAxis 
                           dataKey="epoch" 
                           stroke="#9CA3AF"
-                          style={{ fontSize: '12px' }}
-                          label={{ value: 'Epoch', position: 'insideBottom', offset: -5, style: { fill: '#9CA3AF' } }}
+                          tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                          label={{ 
+                            value: 'Epoch', 
+                            position: 'insideBottom', 
+                            offset: -10, 
+                            style: { fill: '#9CA3AF', fontSize: 12 } 
+                          }}
+                          interval={10}
                         />
                         <YAxis 
                           stroke="#9CA3AF"
-                          style={{ fontSize: '12px' }}
-                          label={{ value: 'Loss', angle: -90, position: 'insideLeft', style: { fill: '#9CA3AF' } }}
+                          tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                          label={{ 
+                            value: 'Loss', 
+                            angle: -90, 
+                            position: 'insideLeft', 
+                            offset: 10,
+                            style: { fill: '#9CA3AF', fontSize: 12 } 
+                          }}
                         />
                         <Tooltip 
-                          contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
-                          labelStyle={{ color: '#F3F4F6' }}
+                          contentStyle={{ 
+                            backgroundColor: '#1F2937', 
+                            border: '1px solid #374151', 
+                            borderRadius: '8px',
+                            padding: '8px 12px'
+                          }}
+                          labelStyle={{ color: '#F3F4F6', marginBottom: '4px', fontSize: '12px' }}
+                          formatter={(value: number) => value.toFixed(4)}
                         />
-                        <Legend wrapperStyle={{ color: '#9CA3AF', fontSize: '12px' }} />
+                        <Legend 
+                          wrapperStyle={{ 
+                            color: '#9CA3AF', 
+                            fontSize: '12px',
+                            paddingTop: '10px'
+                          }} 
+                        />
                         <Line 
                           type="monotone" 
                           dataKey="trainLoss" 
@@ -281,27 +308,53 @@ export default function Home() {
                   {/* Accuracy Chart */}
                   <Card className="p-6 bg-gray-900 border-gray-800">
                     <h3 className="text-xl font-normal mb-6 text-gray-300">Training & Validation Accuracy</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <ResponsiveContainer width="100%" height={350}>
+                      <LineChart 
+                        data={chartData} 
+                        margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                      >
                         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                         <XAxis 
                           dataKey="epoch" 
                           stroke="#9CA3AF"
-                          style={{ fontSize: '12px' }}
-                          label={{ value: 'Epoch', position: 'insideBottom', offset: -5, style: { fill: '#9CA3AF' } }}
+                          tick={{ fill: '#9CA3AF', fontSize: 11 }}
+                          label={{ 
+                            value: 'Epoch', 
+                            position: 'insideBottom', 
+                            offset: -10, 
+                            style: { fill: '#9CA3AF', fontSize: 12 } 
+                          }}
+                          interval={10}
                         />
                         <YAxis 
                           stroke="#9CA3AF"
-                          style={{ fontSize: '12px' }}
+                          tick={{ fill: '#9CA3AF', fontSize: 11 }}
                           domain={[90, 100]}
-                          label={{ value: 'Accuracy (%)', angle: -90, position: 'insideLeft', style: { fill: '#9CA3AF' } }}
+                          label={{ 
+                            value: 'Accuracy (%)', 
+                            angle: -90, 
+                            position: 'insideLeft', 
+                            offset: 10,
+                            style: { fill: '#9CA3AF', fontSize: 12 } 
+                          }}
                         />
                         <Tooltip 
-                          contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
-                          labelStyle={{ color: '#F3F4F6' }}
+                          contentStyle={{ 
+                            backgroundColor: '#1F2937', 
+                            border: '1px solid #374151', 
+                            borderRadius: '8px',
+                            padding: '8px 12px'
+                          }}
+                          labelStyle={{ color: '#F3F4F6', marginBottom: '4px', fontSize: '12px' }}
                           formatter={(value: number) => `${value.toFixed(2)}%`}
                         />
-                        <Legend wrapperStyle={{ color: '#9CA3AF', fontSize: '12px' }} />
+                        <Legend 
+                          wrapperStyle={{ 
+                            color: '#9CA3AF', 
+                            fontSize: '12px',
+                            paddingTop: '10px'
+                          }} 
+                        />
                         <Line 
                           type="monotone" 
                           dataKey="trainAcc" 
@@ -331,7 +384,7 @@ export default function Home() {
             })()}
           </motion.section>
 
-          {/* Flowchart Section */}
+          {/* High-Level Flowchart Section */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -339,111 +392,181 @@ export default function Home() {
             className="mb-32"
           >
             <h2 className="text-4xl md:text-5xl font-light text-center mb-16">
-              Recognition Pipeline
+              High-Level Architecture Flowchart
             </h2>
             
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <Card className="p-8 bg-gray-900 border-gray-800">
-                <div className="relative">
-                  {/* Step 1 */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg border-2 border-blue-400">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
+                <div className="relative" style={{ minHeight: '800px' }}>
+                  {/* Data Extraction */}
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg px-6 py-4 shadow-lg border-2 border-purple-500">
+                      <h3 className="text-lg font-semibold text-white text-center">Data Extraction from<br/>Kaggle ASL Alphabet Dataset</h3>
                     </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">Webcam Input</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">User shows hand sign to camera in real-time</p>
                   </div>
 
-                  {/* Arrow Down */}
-                  <div className="flex justify-center mb-8">
-                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {/* Arrow Down to Database */}
+                  <div className="absolute top-24 left-1/2 transform -translate-x-1/2">
+                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </div>
 
-                  {/* Step 2 */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg border-2 border-purple-400">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
+                  {/* Database */}
+                  <div className="absolute top-36 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-lg px-6 py-4 shadow-lg border-2 border-indigo-500" style={{ width: '200px' }}>
+                      <h3 className="text-lg font-semibold text-white text-center">Database<br/>(Processed Data Storage)</h3>
                     </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">MediaPipe Detection</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">Extracts 21 hand landmarks (x, y, z coordinates)</p>
                   </div>
 
-                  {/* Arrow Down */}
-                  <div className="flex justify-center mb-8">
-                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {/* Arrow Down from Database */}
+                  <div className="absolute top-56 left-1/2 transform -translate-x-1/2">
+                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </div>
 
-                  {/* Step 3 */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-orange-400">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
+                  {/* Split Point - Three paths */}
+                  <div className="absolute top-68 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-500 rounded-full"></div>
+
+                  {/* Left Branch: Data Processing */}
+                  <div className="absolute top-72 left-1/4 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 rounded-lg px-5 py-3 shadow-lg border-2 border-cyan-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Process and Clean Dataset</h3>
                     </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">Feature Extraction</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">Flattens landmarks to 63 features (21 × 3 coordinates)</p>
                   </div>
 
-                  {/* Arrow Down */}
-                  <div className="flex justify-center mb-8">
-                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {/* Arrow from Database to Process */}
+                  <div className="absolute top-68 left-1/3 transform -translate-x-1/2">
+                    <svg className="w-16 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'rotate(-45deg)' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+
+                  {/* Convert to Landmarks */}
+                  <div className="absolute top-96 left-1/4 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 rounded-lg px-5 py-3 shadow-lg border-2 border-cyan-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Convert Images to<br/>MediaPipe Hand Landmarks</h3>
+                    </div>
+                  </div>
+
+                  {/* Arrow Down from Convert */}
+                  <div className="absolute top-120 left-1/4 transform -translate-x-1/2">
+                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </div>
 
-                  {/* Step 4 */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg border-2 border-green-400">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                      </svg>
+                  {/* Arrow back to Database (curved) */}
+                  <div className="absolute top-132 left-1/3 transform -translate-x-1/2">
+                    <svg className="w-20 h-20 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'rotate(135deg)' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+
+                  {/* Right Branch: Model Training */}
+                  <div className="absolute top-72 right-1/4 transform translate-x-1/2">
+                    <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-lg px-5 py-3 shadow-lg border-2 border-orange-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Extract Features<br/>and Labels</h3>
                     </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">ONNX Inference</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">MLP model predicts sign (A-Z) with confidence score using GPU acceleration</p>
+                  </div>
+
+                  {/* Arrow from Database to Extract */}
+                  <div className="absolute top-68 right-1/3 transform translate-x-1/2">
+                    <svg className="w-16 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'rotate(45deg)' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+
+                  {/* Split Data */}
+                  <div className="absolute top-96 right-1/4 transform translate-x-1/2">
+                    <div className="bg-gradient-to-br from-orange-600 to-orange-700 rounded-lg px-5 py-3 shadow-lg border-2 border-orange-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Split Data:<br/>80% Training, 20% Validation</h3>
+                    </div>
                   </div>
 
                   {/* Arrow Down */}
-                  <div className="flex justify-center mb-8">
-                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="absolute top-120 right-1/4 transform translate-x-1/2">
+                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </div>
 
-                  {/* Step 5 */}
-                  <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg border-2 border-red-400">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                  {/* Train Model */}
+                  <div className="absolute top-132 right-1/4 transform translate-x-1/2">
+                    <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-lg px-5 py-3 shadow-lg border-2 border-red-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Train PyTorch MLP<br/>Neural Network</h3>
                     </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">Display Result</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">Shows detected letter (A-Z) and confidence percentage in real-time</p>
                   </div>
 
                   {/* Arrow Down */}
-                  <div className="flex justify-center mb-8">
-                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="absolute top-156 right-1/4 transform translate-x-1/2">
+                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                   </div>
 
-                  {/* Step 6 */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg border-2 border-teal-400">
-                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
+                  {/* Test Accuracy */}
+                  <div className="absolute top-168 right-1/4 transform translate-x-1/2">
+                    <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-lg px-5 py-3 shadow-lg border-2 border-red-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Test Accuracy on<br/>Validation Data</h3>
                     </div>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">Progress Tracking</h3>
-                    <p className="text-sm text-gray-400 text-center max-w-xs">Saves practice session to database via FastAPI (if logged in)</p>
+                  </div>
+
+                  {/* Arrow back to Train (curved) */}
+                  <div className="absolute top-180 right-1/3 transform translate-x-1/2">
+                    <svg className="w-20 h-20 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'rotate(-135deg)' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </div>
+
+                  {/* Center Path: Export to ONNX */}
+                  <div className="absolute top-72 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-lg px-5 py-3 shadow-lg border-2 border-green-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Export Model<br/>to ONNX Format</h3>
+                    </div>
+                  </div>
+
+                  {/* Arrow Down */}
+                  <div className="absolute top-96 left-1/2 transform -translate-x-1/2">
+                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+
+                  {/* FastAPI Implementation */}
+                  <div className="absolute top-108 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-lg px-5 py-3 shadow-lg border-2 border-green-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Implement ONNX Model<br/>in FastAPI Backend</h3>
+                    </div>
+                  </div>
+
+                  {/* Arrow Down */}
+                  <div className="absolute top-132 left-1/2 transform -translate-x-1/2">
+                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+
+                  {/* Frontend Integration */}
+                  <div className="absolute top-144 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg px-5 py-3 shadow-lg border-2 border-blue-500" style={{ width: '220px' }}>
+                      <h3 className="text-base font-semibold text-white text-center">Call FastAPI from<br/>Next.js Frontend</h3>
+                    </div>
+                  </div>
+
+                  {/* Arrow Down */}
+                  <div className="absolute top-168 left-1/2 transform -translate-x-1/2">
+                    <svg className="w-6 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+
+                  {/* Final: Real-time Recognition */}
+                  <div className="absolute top-180 left-1/2 transform -translate-x-1/2">
+                    <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg px-6 py-4 shadow-lg border-2 border-purple-500" style={{ width: '240px' }}>
+                      <h3 className="text-lg font-semibold text-white text-center">Real-time ASL Recognition<br/>in Browser</h3>
+                    </div>
                   </div>
                 </div>
               </Card>
