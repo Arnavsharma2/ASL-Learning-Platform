@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { initializeHands, startCamera, drawHands, MediaPipeResults } from '@/lib/mediapipe';
 import onnxInference from '@/lib/onnx-inference';
 import { HandLandmarks } from '@/lib/mediapipe';
-import { Zap, Trophy, Clock, Target } from 'lucide-react';
+import { Trophy, Clock, Target } from 'lucide-react';
 
 type ChallengeMode = 'setup' | 'countdown' | 'challenge' | 'results';
 
@@ -16,6 +16,7 @@ export default function TimeChallengePage() {
   // Mode and configuration
   const [mode, setMode] = useState<ChallengeMode>('setup');
   const [numLetters, setNumLetters] = useState<number>(10);
+  const [numLettersInput, setNumLettersInput] = useState<string>('10');
 
   // Challenge state
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
@@ -106,6 +107,28 @@ export default function TimeChallengePage() {
     loadModel();
   }, []);
 
+  // Initialize camera when challenge mode starts
+  useEffect(() => {
+    if (mode === 'challenge' && !cameraActive) {
+      // Use requestAnimationFrame to ensure DOM is updated and refs are available
+      let retryCount = 0;
+      const maxRetries = 10;
+      
+      const initCamera = () => {
+        if (videoRef.current && canvasRef.current) {
+          initializeCamera();
+        } else if (retryCount < maxRetries) {
+          // Retry if refs aren't available yet (with max retries to prevent infinite loop)
+          retryCount++;
+          requestAnimationFrame(initCamera);
+        } else {
+          console.error('Failed to initialize camera: video/canvas refs not available');
+        }
+      };
+      requestAnimationFrame(initCamera);
+    }
+  }, [mode, cameraActive]);
+
   // Generate random letters for challenge
   const generateChallenge = () => {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -122,11 +145,6 @@ export default function TimeChallengePage() {
     generateChallenge();
     setMode('countdown');
     setCountdownValue(3);
-
-    // Start camera if not already active
-    if (!cameraActive) {
-      await initializeCamera();
-    }
 
     // Countdown
     const countdownInterval = setInterval(() => {
@@ -242,10 +260,24 @@ export default function TimeChallengePage() {
 
   // Stop camera
   const stopCamera = () => {
+    // Stop frame processing first
+    if (videoRef.current && (videoRef.current as any).__stopFrameProcessing) {
+      (videoRef.current as any).__stopFrameProcessing();
+    }
+
+    // Stop camera stream tracks
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+
+    // Clear video element
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.srcObject = null;
+    }
+
+    // Close MediaPipe hands
     if (handsRef.current) {
       try {
         handsRef.current.close();
@@ -254,9 +286,15 @@ export default function TimeChallengePage() {
       }
       handsRef.current = null;
     }
-    if (videoRef.current && (videoRef.current as any).__stopFrameProcessing) {
-      (videoRef.current as any).__stopFrameProcessing();
+
+    // Clear canvas
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }
     }
+
     setCameraActive(false);
   };
 
@@ -281,6 +319,12 @@ export default function TimeChallengePage() {
     const centiseconds = Math.floor((ms % 1000) / 10);
 
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${centiseconds.toString().padStart(2, '0')}`;
+  };
+
+  // ASL alphabet image URLs from a reliable source
+  const getASLImageUrl = (letter: string) => {
+    // Using ASL alphabet images from a public CDN
+    return `https://www.lifeprint.com/asl101/fingerspelling/abc-gifs/${letter.toLowerCase()}.gif`;
   };
 
   // Cleanup on unmount
@@ -312,7 +356,6 @@ export default function TimeChallengePage() {
             <div className="max-w-2xl mx-auto">
               <Card className="p-8 bg-gray-900/30 border-gray-800">
                 <div className="text-center mb-6">
-                  <Zap className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
                   <h2 className="text-2xl font-semibold mb-2">Configure Your Challenge</h2>
                   <p className="text-gray-400">How many letters do you want to sign?</p>
                 </div>
@@ -324,8 +367,30 @@ export default function TimeChallengePage() {
                       type="number"
                       min="5"
                       max="50"
-                      value={numLetters}
-                      onChange={(e) => setNumLetters(Math.max(5, Math.min(50, parseInt(e.target.value) || 10)))}
+                      value={numLettersInput}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setNumLettersInput(value);
+                        const num = parseInt(value, 10);
+                        if (!isNaN(num) && num >= 5 && num <= 50) {
+                          setNumLetters(num);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        // Ensure a valid value when user leaves the field
+                        const value = e.target.value;
+                        const num = parseInt(value, 10);
+                        if (isNaN(num) || num < 5) {
+                          setNumLetters(5);
+                          setNumLettersInput('5');
+                        } else if (num > 50) {
+                          setNumLetters(50);
+                          setNumLettersInput('50');
+                        } else {
+                          setNumLetters(num);
+                          setNumLettersInput(num.toString());
+                        }
+                      }}
                       className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg text-white text-center text-2xl focus:outline-none focus:ring-2 focus:ring-yellow-500"
                     />
                     <p className="text-xs text-gray-500 mt-1 text-center">Min: 5, Max: 50</p>
@@ -400,20 +465,28 @@ export default function TimeChallengePage() {
 
                     {/* Hint Overlay */}
                     {showHint && (
-                      <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-10">
-                        <p className="text-yellow-400 text-xl mb-4">Time's up! Here's a hint:</p>
-                        <div className="text-9xl font-bold text-white mb-4">
+                      <div className="absolute inset-0 bg-black/95 flex flex-col items-center justify-center z-10 p-6">
+                        <p className="text-yellow-400 text-2xl font-semibold mb-2">Time's up! Here's how to sign:</p>
+                        <div className="text-8xl font-bold text-white mb-6">
                           {challengeLetters[currentLetterIndex]}
                         </div>
-                        <img
-                          src={`/asl-alphabet/${challengeLetters[currentLetterIndex].toLowerCase()}.png`}
-                          alt={challengeLetters[currentLetterIndex]}
-                          className="w-64 h-64 object-contain mb-4"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                        <p className="text-gray-400">Moving to next letter in {hintTimer}s...</p>
+                        <div className="bg-white/10 rounded-lg p-6 mb-6 max-w-md w-full">
+                          <img
+                            src={getASLImageUrl(challengeLetters[currentLetterIndex])}
+                            alt={`ASL sign for letter ${challengeLetters[currentLetterIndex]}`}
+                            className="w-full h-auto object-contain"
+                            onError={(e) => {
+                              // Fallback if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `<div class="text-6xl font-bold text-gray-400 text-center py-8">Image unavailable</div>`;
+                              }
+                            }}
+                          />
+                        </div>
+                        <p className="text-gray-300 text-lg">Moving to next letter in <span className="text-yellow-400 font-bold">{hintTimer}</span>s...</p>
                       </div>
                     )}
                   </div>
@@ -443,7 +516,7 @@ export default function TimeChallengePage() {
                   </div>
                   <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-300"
+                      className="h-full bg-white transition-all duration-300"
                       style={{ width: `${((currentLetterIndex + 1) / challengeLetters.length) * 100}%` }}
                     />
                   </div>
