@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect, Suspense } from 'react';
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSettings } from '@/contexts/SettingsContext';
-import { MediaPipeResults, HandLandmarks } from '@/lib/mediapipe';
-import { AdaptiveCameraFeed } from '@/components/AdaptiveCameraFeed';
+import { MediaPipeResults, HandLandmarks, initializeHands, startCamera, drawHands } from '@/lib/mediapipe';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -33,6 +32,13 @@ function PracticePageContent() {
   const [confidence, setConfidence] = useState<number>(0);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [targetSign, setTargetSign] = useState<string | null>(null);
+
+  // Camera and CV state
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const handsRef = useRef<any>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [cameraActive, setCameraActive] = useState(false);
 
   const lastRecordedRef = useRef<{ sign: string; timestamp: number } | null>(null);
   const lastInferenceRef = useRef<number>(0);
@@ -94,7 +100,91 @@ function PracticePageContent() {
     loadModel();
   }, []);
 
-  const handleHandDetection = async (results: MediaPipeResults) => {
+  // Initialize camera
+  const initializeCamera = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    try {
+      const hands = await initializeHands(handleHandDetection);
+      handsRef.current = hands;
+
+      // Start camera with continuous video drawing for 100% uptime
+      const stream = await startCamera(videoRef.current, hands, canvasRef.current);
+      streamRef.current = stream;
+      setCameraActive(true);
+    } catch (err) {
+      console.error('Failed to initialize camera:', err);
+      setCameraActive(false);
+    }
+  };
+
+  // Stop camera
+  const stopCamera = () => {
+    // Stop frame processing first
+    if (videoRef.current && (videoRef.current as any).__stopFrameProcessing) {
+      (videoRef.current as any).__stopFrameProcessing();
+    }
+
+    // Stop camera stream tracks
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+
+    // Clear video element
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.srcObject = null;
+    }
+
+    // Close MediaPipe hands
+    if (handsRef.current) {
+      try {
+        handsRef.current.close();
+      } catch (e) {
+        // Ignore
+      }
+      handsRef.current = null;
+    }
+
+    // Clear canvas
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }
+    }
+
+    setCameraActive(false);
+  };
+
+  const updateLessonProgress = useCallback(async () => {
+    if (!user || !lessonId) return;
+
+    try {
+      await progressApi.updateProgress({
+        user_id: user.id,
+        lesson_id: parseInt(lessonId),
+        attempts: totalAttempts,
+        accuracy: totalAttempts > 0 ? correctAttempts / totalAttempts : 0,
+        status: 'mastered', // Mark as mastered when completing 10 correct attempts
+      });
+      console.log('Lesson marked as mastered!');
+    } catch (error) {
+      console.error('Failed to update progress:', error);
+    }
+  }, [user, lessonId, totalAttempts, correctAttempts]);
+
+  const handleHandDetection = useCallback(async (results: MediaPipeResults) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Draw hands (video is drawn continuously, this is just for compatibility)
+    drawHands(ctx, results, 640, 480, videoRef.current || undefined);
+
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
       // Skip if model is not loaded - show hand tracking only
       if (!onnxInference.isModelLoaded()) {
@@ -209,24 +299,39 @@ function PracticePageContent() {
       setDetectedSign(null);
       setConfidence(0);
     }
-  };
+  }, [targetSign, user, completed, MIN_CONFIDENCE, updateLessonProgress]);
 
-  const updateLessonProgress = async () => {
-    if (!user || !lessonId) return;
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Stop frame processing first
+      if (videoRef.current && (videoRef.current as any).__stopFrameProcessing) {
+        (videoRef.current as any).__stopFrameProcessing();
+      }
 
-    try {
-      await progressApi.updateProgress({
-        user_id: user.id,
-        lesson_id: parseInt(lessonId),
-        attempts: totalAttempts,
-        accuracy: correctAttempts / totalAttempts,
-        status: 'mastered', // Mark as mastered when completing 10 correct attempts
-      });
-      console.log('Lesson marked as mastered!');
-    } catch (error) {
-      console.error('Failed to update progress:', error);
-    }
-  };
+      // Stop camera stream tracks
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+
+      // Clear video element
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.srcObject = null;
+      }
+
+      // Close MediaPipe hands
+      if (handsRef.current) {
+        try {
+          handsRef.current.close();
+        } catch (e) {
+          // Ignore
+        }
+        handsRef.current = null;
+      }
+    };
+  }, []);
 
   const handleRestart = () => {
     setCorrectAttempts(0);
@@ -310,11 +415,43 @@ function PracticePageContent() {
                 </Card>
               ) : (
                 <>
-                  <AdaptiveCameraFeed
-                    onHandDetected={handleHandDetection}
-                    width={640}
-                    height={480}
-                  />
+                  <Card className="p-4 bg-gray-900/30 border-gray-800">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Camera Feed</h3>
+                      <Button
+                        onClick={cameraActive ? stopCamera : initializeCamera}
+                        variant={cameraActive ? "destructive" : "default"}
+                        disabled={modelLoading}
+                      >
+                        {cameraActive ? 'Stop Camera' : 'Start Camera'}
+                      </Button>
+                    </div>
+                    <div className="relative bg-black rounded-lg overflow-hidden w-full" style={{ aspectRatio: '4/3', maxWidth: '640px' }}>
+                      <video
+                        ref={videoRef}
+                        className="absolute top-0 left-0 w-full h-full object-cover opacity-0"
+                        playsInline
+                        muted
+                        autoPlay
+                      />
+                      <canvas
+                        ref={canvasRef}
+                        width={640}
+                        height={480}
+                        className="absolute top-0 left-0 w-full h-full object-cover"
+                      />
+
+                      {/* Camera not active overlay */}
+                      {!cameraActive && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white">
+                          <div className="text-center">
+                            <p className="text-lg mb-2">Camera is off</p>
+                            <p className="text-sm text-gray-400">Click "Start Camera" to begin</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
                   {/* Real-time Feedback Overlay */}
                   {showFeedback && targetSign && (
                     <div className="mt-4">

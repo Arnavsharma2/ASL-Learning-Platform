@@ -84,6 +84,19 @@ export async function startCamera(
   videoElement.srcObject = stream;
   await videoElement.play();
 
+  // Wait for video to be ready before starting processing
+  // This prevents MediaPipe from receiving invalid frames
+  await new Promise((resolve) => {
+    const checkReady = () => {
+      if (videoElement.readyState >= 2 && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
+        resolve(undefined);
+      } else {
+        setTimeout(checkReady, 50);
+      }
+    };
+    checkReady();
+  });
+
   // Continuous video drawing loop - ensures video is always displayed regardless of MediaPipe processing
   let videoDrawAnimationId: number | null = null;
   let shouldDrawVideo = true;
@@ -118,14 +131,25 @@ export async function startCamera(
   let animationFrameId: number | null = null;
   let shouldContinue = true;
   let lastFrameTime = 0;
+  let consecutiveErrors = 0;
+  const MAX_CONSECUTIVE_ERRORS = 5;
 
   // Process frames with throttling for better performance
   const sendFrame = (currentTime: number) => {
     // Check if still active and video is playing
-    if (!videoElement.srcObject || !shouldContinue) {
+    if (!videoElement.srcObject || !shouldContinue || !hands) {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
+      }
+      return;
+    }
+
+    // Validate video element is ready before sending to MediaPipe
+    if (videoElement.readyState < 2 || videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+      // Video not ready yet, continue loop but don't process
+      if (shouldContinue) {
+        animationFrameId = requestAnimationFrame(sendFrame);
       }
       return;
     }
@@ -139,36 +163,58 @@ export async function startCamera(
       isProcessing = true;
       lastFrameTime = currentTime;
 
-      // Process frame asynchronously
-      hands.send({ image: videoElement })
-        .catch((error: any) => {
-          console.error('Error sending frame to MediaPipe:', error);
-          // Stop processing on resource/loading errors to prevent infinite loop
-          const errorMsg = error?.message || error?.toString() || '';
-          if (
-            errorMsg.includes('resource') ||
-            errorMsg.includes('wasm') ||
-            errorMsg.includes('emscripten') ||
-            errorMsg.includes('not found') ||
-            errorMsg.includes('Failed to fetch')
-          ) {
-            console.error('MediaPipe resource error detected. Stopping frame processing.');
-            shouldContinue = false;
-            if (animationFrameId) {
-              cancelAnimationFrame(animationFrameId);
-              animationFrameId = null;
-            }
-            // Clear video source to stop the stream
-            if (videoElement.srcObject) {
-              const stream = videoElement.srcObject as MediaStream;
-              stream.getTracks().forEach(track => track.stop());
-              videoElement.srcObject = null;
-            }
-          }
-        })
-        .finally(() => {
+      // Process frame asynchronously with validation
+      try {
+        // Double-check video is still valid before sending
+        if (videoElement.readyState >= 2 && videoElement.videoWidth > 0 && videoElement.videoHeight > 0 && hands) {
+          hands.send({ image: videoElement })
+            .catch((error: any) => {
+              consecutiveErrors++;
+              const errorMsg = error?.message || error?.toString() || '';
+              
+              // Don't log abort errors repeatedly - they're often transient
+              if (!errorMsg.includes('Aborted') || consecutiveErrors === 1) {
+                console.warn('Error sending frame to MediaPipe:', errorMsg);
+              }
+
+              // Stop processing on critical errors or too many consecutive errors
+              const isCriticalError = 
+                errorMsg.includes('resource') ||
+                errorMsg.includes('wasm') ||
+                errorMsg.includes('emscripten') ||
+                errorMsg.includes('not found') ||
+                errorMsg.includes('Failed to fetch') ||
+                consecutiveErrors >= MAX_CONSECUTIVE_ERRORS;
+
+              if (isCriticalError) {
+                console.error('MediaPipe error threshold reached. Stopping frame processing.');
+                shouldContinue = false;
+                if (animationFrameId) {
+                  cancelAnimationFrame(animationFrameId);
+                  animationFrameId = null;
+                }
+              }
+            })
+            .then(() => {
+              // Reset error counter on success
+              consecutiveErrors = 0;
+            })
+            .finally(() => {
+              isProcessing = false;
+            });
+        } else {
+          // Video not ready, skip this frame
           isProcessing = false;
-        });
+        }
+      } catch (error) {
+        // Catch synchronous errors
+        console.error('Synchronous error in MediaPipe frame processing:', error);
+        isProcessing = false;
+        consecutiveErrors++;
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          shouldContinue = false;
+        }
+      }
     }
 
     // Continue the loop at maximum speed
