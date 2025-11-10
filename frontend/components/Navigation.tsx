@@ -60,13 +60,8 @@ export function Navigation() {
                         Dashboard
                       </Button>
                     </Link>
-                    <Link href="/settings">
-                      <Button variant="ghost" className="text-sm text-gray-400 hover:text-white">
-                        Settings
-                      </Button>
-                    </Link>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       onClick={handleSignOut}
                       className="text-sm text-gray-400 hover:text-white"
                     >

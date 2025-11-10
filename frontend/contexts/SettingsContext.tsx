@@ -19,40 +19,41 @@ interface SettingsContextType {
   resetSettings: () => void;
 }
 
+// Fixed to balanced mode since we're using SageMaker/cloud inference
 const defaultSettings: PerformanceSettings = {
   mode: 'balanced',
   videoResolution: '640x480',
   frameRate: 30,
   modelComplexity: 0,
-  inferenceThrottleMs: 250,
-  minConfidence: 0.8,
+  inferenceThrottleMs: 100, // Fast inference with SageMaker
+  minConfidence: 0.75,
 };
 
-// Preset configurations
+// Preset configurations (all modes now use balanced settings with SageMaker)
 export const performancePresets: Record<PerformanceMode, PerformanceSettings> = {
   max_performance: {
     mode: 'max_performance',
     videoResolution: '640x480',
     frameRate: 30,
     modelComplexity: 0,
-    inferenceThrottleMs: 0, // Use server-side processing (no client inference)
-    minConfidence: 0.7,
+    inferenceThrottleMs: 100, // Cloud inference via SageMaker
+    minConfidence: 0.75,
   },
   balanced: {
     mode: 'balanced',
     videoResolution: '640x480',
     frameRate: 30,
     modelComplexity: 0,
-    inferenceThrottleMs: 500, // Moderate client-side inference
+    inferenceThrottleMs: 100, // Cloud inference via SageMaker
     minConfidence: 0.75,
   },
   max_accuracy: {
     mode: 'max_accuracy',
     videoResolution: '640x480',
     frameRate: 30,
-    modelComplexity: 1,
-    inferenceThrottleMs: 200, // Fast client-side real-time inference
-    minConfidence: 0.8,
+    modelComplexity: 0,
+    inferenceThrottleMs: 100, // Cloud inference via SageMaker
+    minConfidence: 0.75,
   },
 };
 

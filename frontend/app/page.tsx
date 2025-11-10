@@ -5,13 +5,11 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function Home() {
-  const { user } = useAuth();
   const [showNotification, setShowNotification] = useState(true);
 
   // Hide notification if user has dismissed it (stored in localStorage)
@@ -119,14 +117,6 @@ export default function Home() {
               <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
                 Dashboard
               </Link>
-              {user && (
-                <>
-                  <span className="text-gray-600">•</span>
-                  <Link href="/settings" className="text-gray-400 hover:text-white transition-colors">
-                    Settings
-                  </Link>
-                </>
-              )}
             </div>
           </motion.section>
 
