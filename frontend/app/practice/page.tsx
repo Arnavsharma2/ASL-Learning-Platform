@@ -38,8 +38,16 @@ function PracticePageContent() {
   const lastInferenceRef = useRef<number>(0);
   const [sessionCount, setSessionCount] = useState(0);
   const isProcessingRef = useRef<boolean>(false);
+
+  // Performance optimization: throttle inference to max 10 FPS (100ms between calls)
+  const INFERENCE_THROTTLE_MS = 100;
   const [modelLoading, setModelLoading] = useState(true);
   const [modelError, setModelError] = useState<string | null>(null);
+
+  // Performance monitoring (optional - can be removed after testing)
+  const [fps, setFps] = useState<number>(0);
+  const frameCountRef = useRef<number>(0);
+  const lastFpsUpdateRef = useRef<number>(Date.now());
 
   // Guided practice state
   const [correctAttempts, setCorrectAttempts] = useState(0);
@@ -96,13 +104,29 @@ function PracticePageContent() {
         return;
       }
 
-      // No throttling - run inference as fast as possible
-      // Only skip if already processing to prevent concurrent runs
+      // Time-based throttling: only run inference every INFERENCE_THROTTLE_MS
+      const now = Date.now();
+      const timeSinceLastInference = now - lastInferenceRef.current;
+
+      if (timeSinceLastInference < INFERENCE_THROTTLE_MS) {
+        return; // Skip this frame - too soon since last inference
+      }
+
+      // Skip if already processing to prevent concurrent runs
       if (isProcessingRef.current) {
         return; // Skip this frame
       }
 
+      lastInferenceRef.current = now;
       isProcessingRef.current = true;
+
+      // Performance monitoring: track FPS
+      frameCountRef.current++;
+      if (now - lastFpsUpdateRef.current >= 1000) {
+        setFps(frameCountRef.current);
+        frameCountRef.current = 0;
+        lastFpsUpdateRef.current = now;
+      }
 
       try {
         // Extract landmarks from first detected hand
@@ -434,6 +458,15 @@ function PracticePageContent() {
                   <li>• Hold sign steady for 2-3 seconds</li>
                   {targetSign && <li>• Aim for 80%+ confidence for best results</li>}
                 </ul>
+                {fps > 0 && (
+                  <div className="mt-4 pt-4 border-t border-gray-800">
+                    <p className="text-xs text-gray-500">
+                      Performance: <span className="text-green-400 font-semibold">{fps} FPS</span>
+                      <br />
+                      <span className="text-gray-600">Inference throttled to ~10 FPS for optimal performance</span>
+                    </p>
+                  </div>
+                )}
               </Card>
 
               <Card className="p-6 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">

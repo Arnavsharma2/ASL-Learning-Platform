@@ -58,7 +58,7 @@ export async function initializeHands(
   await new Promise(resolve => setTimeout(resolve, 100));
 
   hands.setOptions({
-    maxNumHands: 2,
+    maxNumHands: 1, // Optimize: only track 1 hand for ASL recognition (was 2)
     modelComplexity: 0, // Use lighter model (0 = fastest, 1 = balanced, 2 = most accurate)
     minDetectionConfidence: 0.7, // Slightly higher to reduce false positives
     minTrackingConfidence: 0.5,
@@ -83,13 +83,16 @@ export async function startCamera(
   videoElement.srcObject = stream;
   await videoElement.play();
 
-  // Process frames as fast as possible - no throttling
+  // Performance optimization: limit MediaPipe to ~20 FPS (50ms between frames)
+  // This prevents overwhelming the GPU/CPU while still feeling responsive
+  const FRAME_THROTTLE_MS = 50;
   let isProcessing = false;
   let animationFrameId: number | null = null;
   let shouldContinue = true;
+  let lastFrameTime = 0;
 
-  // Process frames at maximum speed
-  const sendFrame = () => {
+  // Process frames with throttling for better performance
+  const sendFrame = (currentTime: number) => {
     // Check if still active and video is playing
     if (!videoElement.srcObject || !shouldContinue) {
       if (animationFrameId) {
@@ -99,9 +102,14 @@ export async function startCamera(
       return;
     }
 
-    // Process frame if not already processing
-    if (!isProcessing) {
+    // Throttle frame processing - only process if enough time has passed
+    const timeSinceLastFrame = currentTime - lastFrameTime;
+    const shouldProcess = timeSinceLastFrame >= FRAME_THROTTLE_MS;
+
+    // Process frame if not already processing AND enough time has passed
+    if (!isProcessing && shouldProcess) {
       isProcessing = true;
+      lastFrameTime = currentTime;
 
       // Process frame asynchronously
       hands.send({ image: videoElement })

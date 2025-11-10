@@ -52,7 +52,7 @@ class ONNXInference {
       // WebGL uses GPU for faster inference, WASM is CPU fallback
       // ONNX Runtime will automatically use the first available provider
       const executionProviders = ['webgl', 'wasm'];
-      
+
       // Load ONNX model with GPU-optimized settings
       this.session = await ort.InferenceSession.create('/models/model.onnx', {
         executionProviders: executionProviders,
@@ -63,9 +63,10 @@ class ONNXInference {
         logVerbosityLevel: 0,
       });
 
-      // Log successful model load
-      // Note: ONNX Runtime will use WebGL (GPU) if available, otherwise fallback to WASM (CPU)
+      // Log successful model load with actual provider being used
+      const actualProvider = (this.session as any).handler?.executionProviders?.[0] || 'unknown';
       console.log(`ONNX model loaded successfully`);
+      console.log(`Execution Provider: ${actualProvider} (webgl = GPU, wasm = CPU)`);
       console.log(`GPU Acceleration: Attempting WebGL (will fallback to CPU if unavailable)`);
       if (this.labels) {
         console.log(`  Model type: ${this.labels.model_type}`);
