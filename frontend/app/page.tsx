@@ -150,7 +150,7 @@ export default function Home() {
                     <span className="text-xs text-gray-400">TypeScript</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" alt="Tailwind" className="w-16 h-16" />
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">Tailwind</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
@@ -193,9 +193,7 @@ export default function Home() {
                     <span className="text-xs text-gray-400">PostgreSQL</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-teal-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">SQL</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlalchemy/sqlalchemy-original.svg" alt="SQLAlchemy" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">SQLAlchemy</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
@@ -238,7 +236,7 @@ export default function Home() {
                 <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
                   {/* Loss Chart */}
                   <Card className="p-6 bg-gray-900 border-gray-800">
-                    <h3 className="text-xl font-normal mb-6 text-gray-300">Training & Validation Loss</h3>
+                    <h3 className="text-xl font-normal mb-6 text-gray-300 text-center">Training & Validation Loss</h3>
                     <ResponsiveContainer width="100%" height={350}>
                       <LineChart 
                         data={chartData} 
@@ -261,11 +259,11 @@ export default function Home() {
                           stroke="#9CA3AF"
                           tick={{ fill: '#9CA3AF', fontSize: 11 }}
                           label={{ 
-                            value: 'Loss', 
+                            value: 'Training Loss', 
                             angle: -90, 
                             position: 'insideLeft', 
                             offset: 10,
-                            style: { fill: '#9CA3AF', fontSize: 12 } 
+                            style: { fill: '#9CA3AF', fontSize: 12, textAnchor: 'middle' } 
                           }}
                         />
                         <Tooltip 
@@ -282,8 +280,9 @@ export default function Home() {
                           wrapperStyle={{ 
                             color: '#9CA3AF', 
                             fontSize: '12px',
-                            paddingTop: '10px'
-                          }} 
+                            paddingTop: '20px'
+                          }}
+                          verticalAlign="bottom"
                         />
                         <Line 
                           type="monotone" 
@@ -307,7 +306,7 @@ export default function Home() {
 
                   {/* Accuracy Chart */}
                   <Card className="p-6 bg-gray-900 border-gray-800">
-                    <h3 className="text-xl font-normal mb-6 text-gray-300">Training & Validation Accuracy</h3>
+                    <h3 className="text-xl font-normal mb-6 text-gray-300 text-center">Training & Validation Accuracy</h3>
                     <ResponsiveContainer width="100%" height={350}>
                       <LineChart 
                         data={chartData} 
@@ -331,11 +330,11 @@ export default function Home() {
                           tick={{ fill: '#9CA3AF', fontSize: 11 }}
                           domain={[90, 100]}
                           label={{ 
-                            value: 'Accuracy (%)', 
+                            value: 'Validation Accuracy (%)', 
                             angle: -90, 
                             position: 'insideLeft', 
                             offset: 10,
-                            style: { fill: '#9CA3AF', fontSize: 12 } 
+                            style: { fill: '#9CA3AF', fontSize: 12, textAnchor: 'middle' } 
                           }}
                         />
                         <Tooltip 
@@ -352,8 +351,9 @@ export default function Home() {
                           wrapperStyle={{ 
                             color: '#9CA3AF', 
                             fontSize: '12px',
-                            paddingTop: '10px'
-                          }} 
+                            paddingTop: '20px'
+                          }}
+                          verticalAlign="bottom"
                         />
                         <Line 
                           type="monotone" 
@@ -437,11 +437,14 @@ export default function Home() {
                   </div>
 
                   {/* Arrow from Database to Process */}
-                  <div className="absolute top-68 left-1/3 transform -translate-x-1/2">
-                    <svg className="w-16 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'rotate(-45deg)' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
+                  <svg className="absolute top-68 left-1/2" style={{ width: '200px', height: '80px', transform: 'translateX(-50%)' }}>
+                    <defs>
+                      <marker id="arrowhead-left" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#6B7280" />
+                      </marker>
+                    </defs>
+                    <line x1="0" y1="0" x2="-100" y2="40" stroke="#6B7280" strokeWidth="2" markerEnd="url(#arrowhead-left)" />
+                  </svg>
 
                   {/* Convert to Landmarks */}
                   <div className="absolute top-96 left-1/4 transform -translate-x-1/2">
@@ -458,11 +461,14 @@ export default function Home() {
                   </div>
 
                   {/* Arrow back to Database (curved) */}
-                  <div className="absolute top-132 left-1/3 transform -translate-x-1/2">
-                    <svg className="w-20 h-20 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'rotate(135deg)' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
+                  <svg className="absolute top-132 left-1/4" style={{ width: '150px', height: '100px', transform: 'translateX(-50%)' }}>
+                    <defs>
+                      <marker id="arrowhead-back-left" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#6B7280" />
+                      </marker>
+                    </defs>
+                    <path d="M 0 40 Q -50 0 -100 -40" stroke="#6B7280" strokeWidth="2" fill="none" markerEnd="url(#arrowhead-back-left)" />
+                  </svg>
 
                   {/* Right Branch: Model Training */}
                   <div className="absolute top-72 right-1/4 transform translate-x-1/2">
@@ -472,11 +478,14 @@ export default function Home() {
                   </div>
 
                   {/* Arrow from Database to Extract */}
-                  <div className="absolute top-68 right-1/3 transform translate-x-1/2">
-                    <svg className="w-16 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'rotate(45deg)' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
+                  <svg className="absolute top-68 right-1/2" style={{ width: '200px', height: '80px', transform: 'translateX(50%)' }}>
+                    <defs>
+                      <marker id="arrowhead-right" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#6B7280" />
+                      </marker>
+                    </defs>
+                    <line x1="0" y1="0" x2="100" y2="40" stroke="#6B7280" strokeWidth="2" markerEnd="url(#arrowhead-right)" />
+                  </svg>
 
                   {/* Split Data */}
                   <div className="absolute top-96 right-1/4 transform translate-x-1/2">
@@ -514,11 +523,14 @@ export default function Home() {
                   </div>
 
                   {/* Arrow back to Train (curved) */}
-                  <div className="absolute top-180 right-1/3 transform translate-x-1/2">
-                    <svg className="w-20 h-20 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ transform: 'rotate(-135deg)' }}>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
+                  <svg className="absolute top-180 right-1/4" style={{ width: '150px', height: '100px', transform: 'translateX(50%)' }}>
+                    <defs>
+                      <marker id="arrowhead-back-right" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#6B7280" />
+                      </marker>
+                    </defs>
+                    <path d="M 0 40 Q 50 0 100 -40" stroke="#6B7280" strokeWidth="2" fill="none" markerEnd="url(#arrowhead-back-right)" />
+                  </svg>
 
                   {/* Center Path: Export to ONNX */}
                   <div className="absolute top-72 left-1/2 transform -translate-x-1/2">
