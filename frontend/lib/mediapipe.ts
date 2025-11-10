@@ -110,9 +110,9 @@ export async function startCamera(
     checkReady();
   });
 
-  // Performance optimization: limit MediaPipe to ~10 FPS (100ms between frames)
-  // Since we're using SageMaker for inference, we don't need super high frame rate
-  const FRAME_THROTTLE_MS = 100;
+  // Keep MediaPipe at 30 FPS for smooth hand detection
+  // We'll throttle the inference separately
+  const FRAME_THROTTLE_MS = 33; // ~30 FPS
   let isProcessing = false;
   let animationFrameId: number | null = null;
   let shouldContinue = true;
@@ -260,15 +260,14 @@ export function drawHands(
   }
   // If no video frame available, don't clear - keep previous frame visible to prevent black screen
 
-  // Only draw landmarks if hands are detected
-  if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-    for (const landmarks of results.multiHandLandmarks) {
-      // Draw connections
-      drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS);
-      // Draw landmarks
-      drawLandmarks(canvasCtx, landmarks);
-    }
-  }
+  // Skip drawing landmarks to improve performance
+  // The hand detection still works, we just don't visualize it
+  // if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+  //   for (const landmarks of results.multiHandLandmarks) {
+  //     drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS);
+  //     drawLandmarks(canvasCtx, landmarks);
+  //   }
+  // }
 
   canvasCtx.restore();
 }
