@@ -62,6 +62,8 @@ export function AdaptiveCameraFeed({
         }
       });
 
+      if (!videoRef.current) return;
+
       handsRef.current = hands;
 
       // Start camera
@@ -70,6 +72,13 @@ export function AdaptiveCameraFeed({
       setError(null);
     } catch (err: any) {
       console.error('Error initializing client mode:', err);
+
+      // Ignore errors that happen during cleanup/unmount
+      const errorMsg = err?.message || '';
+      if (errorMsg.includes('interrupted') || errorMsg.includes('AbortError')) {
+        return; // Component is unmounting, ignore
+      }
+
       setError('Failed to access camera or load MediaPipe');
       setIsActive(false);
     }
@@ -85,10 +94,21 @@ export function AdaptiveCameraFeed({
         video: { width, height },
       });
 
+      if (!videoRef.current) return;
+
       videoRef.current.srcObject = stream;
       videoRef.current.playsInline = true;
       videoRef.current.muted = true;
-      await videoRef.current.play();
+
+      try {
+        await videoRef.current.play();
+      } catch (playError: any) {
+        // Ignore "interrupted by new load" errors during cleanup
+        if (!playError.message?.includes('interrupted')) {
+          throw playError;
+        }
+      }
+
       streamRef.current = stream;
 
       // Process frames periodically (like the other repo - every few seconds)
@@ -173,8 +193,14 @@ export function AdaptiveCameraFeed({
     if (!isActive) return;
 
     let isMounted = true;
+    let cleanupCalled = false;
 
     const initialize = async () => {
+      // Small delay to prevent race conditions during mode switching
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      if (!isMounted || cleanupCalled) return;
+
       if (isServerMode) {
         await initializeServerMode();
       } else {
@@ -187,6 +213,7 @@ export function AdaptiveCameraFeed({
     return () => {
       // Cleanup
       isMounted = false;
+      cleanupCalled = true;
 
       // Stop server interval
       if (serverIntervalRef.current) {
