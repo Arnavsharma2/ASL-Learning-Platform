@@ -1,14 +1,19 @@
 /**
  * ONNX Runtime Web inference for ASL sign recognition
  * Uses the trained PyTorch model exported to ONNX format
+ * Supports browser-based, cloud API, and AWS SageMaker inference
  */
 
 import * as ort from 'onnxruntime-web';
+import cloudInference from './cloud-inference';
+import sageMakerInference from './sagemaker-inference';
 
 export interface ModelPrediction {
   sign: string;
   confidence: number;
   probabilities: { [key: string]: number };
+  inferenceMode?: 'browser' | 'cloud' | 'sagemaker';  // Track which mode was used
+  inferenceTimeMs?: number;  // Inference time
 }
 
 interface LabelMapping {
@@ -99,6 +104,46 @@ class ONNXInference {
   }
 
   async predict(landmarks: number[][]): Promise<ModelPrediction> {
+    const startTime = performance.now();
+
+    // Try SageMaker first if configured
+    if (sageMakerInference.isConfigured()) {
+      try {
+        console.log('Using AWS SageMaker inference...');
+        const sageMakerResult = await sageMakerInference.predict(landmarks);
+        const inferenceTime = performance.now() - startTime;
+        return {
+          sign: sageMakerResult.sign,
+          confidence: sageMakerResult.confidence,
+          probabilities: sageMakerResult.probabilities,
+          inferenceMode: 'sagemaker',
+          inferenceTimeMs: inferenceTime,
+        };
+      } catch (error) {
+        console.warn('SageMaker inference failed, falling back to browser:', error);
+        // Fall through to browser inference
+      }
+    }
+
+    // Try cloud API if available
+    if (cloudInference.isReady()) {
+      try {
+        console.log('Using cloud API inference...');
+        const cloudResult = await cloudInference.predict(landmarks);
+        return {
+          sign: cloudResult.sign,
+          confidence: cloudResult.confidence,
+          probabilities: cloudResult.probabilities,
+          inferenceMode: 'cloud',
+          inferenceTimeMs: cloudResult.inference_time_ms,
+        };
+      } catch (error) {
+        console.warn('Cloud inference failed, falling back to browser:', error);
+        // Fall through to browser inference
+      }
+    }
+
+    // Browser-based inference (fallback or default)
     if (!this.session || !this.labels) {
       throw new Error('Model not loaded. Call loadModel() first.');
     }
@@ -145,6 +190,8 @@ class ONNXInference {
       }
     }
 
+    const inferenceTime = performance.now() - startTime;
+
     // If no letter found (shouldn't happen), fall back to original prediction
     if (bestLetterIdx === -1) {
       const predictedIdx = probabilities.indexOf(Math.max(...probabilities));
@@ -153,6 +200,8 @@ class ONNXInference {
         sign: predictedSign,
         confidence: probabilities[predictedIdx],
         probabilities: this.createProbabilityMap(probabilities, ONNXInference.ALPHABET_LETTERS),
+        inferenceMode: 'browser',
+        inferenceTimeMs: inferenceTime,
       };
     }
 
@@ -166,6 +215,8 @@ class ONNXInference {
       sign: predictedSign,
       confidence: confidence,
       probabilities: probabilityMap,
+      inferenceMode: 'browser',
+      inferenceTimeMs: inferenceTime,
     };
   }
 
