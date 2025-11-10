@@ -109,6 +109,11 @@ export function AdaptiveCameraFeed({
           // Send to server for detection
           const response = await detectHandsOnServer(imageDataUrl, false);
 
+          // If server returns no landmarks (MediaPipe not available), skip processing
+          if (!response || response.hand_count === 0) {
+            return;
+          }
+
           // Convert to MediaPipe format and trigger callback
           const mediaPipeResults = convertServerLandmarksToMediaPipe(response.landmarks);
 
@@ -144,8 +149,12 @@ export function AdaptiveCameraFeed({
               ...mediaPipeResults
             });
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error('Server frame processing error:', err);
+          // If server is unavailable, show helpful error
+          if (err?.message?.includes('Failed to fetch') || err?.message?.includes('NetworkError')) {
+            console.warn('Server unavailable - hand detection requires backend with OpenCV/MediaPipe');
+          }
         }
       };
 

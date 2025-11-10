@@ -8,19 +8,22 @@ load_dotenv()
 
 # Import routes (will show warnings if DB not configured, but won't crash)
 try:
-    from routes import lessons, progress, hand_detection
+    from routes import lessons, progress
     routes_available = True
 except Exception as e:
     print(f"Warning: Could not load routes: {e}")
     print("API will run in limited mode. Configure Supabase to enable all endpoints.")
     routes_available = False
 
-# Always import hand_detection (doesn't require DB)
+# Import hand_detection separately (requires OpenCV/MediaPipe)
 try:
     from routes import hand_detection
     hand_detection_available = True
+    print("✅ Hand detection endpoint loaded successfully")
 except Exception as e:
-    print(f"Warning: Could not load hand_detection route: {e}")
+    print(f"⚠️  Hand detection route unavailable: {e}")
+    print("💡 To enable server-side hand detection, install: pip install opencv-python-headless mediapipe")
+    print("✅ Client-side modes (Balanced/Max Accuracy) will still work perfectly!")
     hand_detection_available = False
 
 app = FastAPI(
@@ -88,6 +91,7 @@ async def health_check():
         "database": db_status,
         "supabase": supabase_status,
         "routes_available": routes_available,
+        "hand_detection_available": hand_detection_available,
         "message": "Configure SUPABASE_URL and DATABASE_URL in .env to enable all features"
     }
 
