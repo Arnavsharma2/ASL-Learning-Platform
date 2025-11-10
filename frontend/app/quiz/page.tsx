@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { lessonsApi } from '@/lib/api';
-import { Shuffle, Target, CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
+import { CheckCircle2, XCircle, RotateCcw } from 'lucide-react';
 
 interface Lesson {
   id: number;
@@ -60,7 +60,14 @@ export default function QuizPage() {
   };
 
   const categories = Array.from(new Set(allLessons.map(l => l.category)));
-  const alphabetLetters = allLessons.filter(l => l.category === 'alphabet').map(l => l.sign_name);
+  // Only get A-Z letters
+  const alphabetLetters = allLessons
+    .filter(l => {
+      const signName = l.sign_name;
+      return signName && signName.length === 1 && /^[A-Z]$/.test(signName);
+    })
+    .map(l => l.sign_name)
+    .sort();
 
   const toggleLetter = (letter: string) => {
     if (selectedLetters.includes(letter)) {
@@ -73,12 +80,18 @@ export default function QuizPage() {
   const startQuiz = () => {
     let questionsPool: Lesson[] = [];
 
+    // Filter to only alphabet letters (A-Z)
+    const alphabetOnly = allLessons.filter(l => {
+      const signName = l.sign_name;
+      return signName && signName.length === 1 && /^[A-Z]$/.test(signName);
+    });
+
     if (selectionMode === 'random-all') {
-      questionsPool = [...allLessons];
+      questionsPool = [...alphabetOnly];
     } else if (selectionMode === 'random-category') {
-      questionsPool = allLessons.filter(l => l.category === selectedCategory);
+      questionsPool = alphabetOnly.filter(l => l.category === selectedCategory);
     } else if (selectionMode === 'custom') {
-      questionsPool = allLessons.filter(l => selectedLetters.includes(l.sign_name));
+      questionsPool = alphabetOnly.filter(l => selectedLetters.includes(l.sign_name));
     }
 
     // Shuffle and select questions
@@ -145,8 +158,12 @@ export default function QuizPage() {
 
   const generateOptions = (correctAnswer: string): string[] => {
     const options = new Set<string>([correctAnswer]);
+    // Only use A-Z letters
     const availableLetters = allLessons
-      .filter(l => l.category === 'alphabet')
+      .filter(l => {
+        const signName = l.sign_name;
+        return signName && signName.length === 1 && /^[A-Z]$/.test(signName);
+      })
       .map(l => l.sign_name);
 
     while (options.size < 4 && options.size < availableLetters.length) {
@@ -159,7 +176,7 @@ export default function QuizPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-black text-white">
         <Navigation />
         <main className="container mx-auto px-4 py-8">
           <div className="text-center py-12">
@@ -173,7 +190,7 @@ export default function QuizPage() {
   // Setup Mode
   if (mode === 'setup') {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-black text-white">
         <Navigation />
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
@@ -196,7 +213,6 @@ export default function QuizPage() {
                       : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
                   }`}
                 >
-                  <Shuffle className="w-8 h-8 mx-auto mb-2 text-blue-600" />
                   <h3 className="font-semibold mb-1">Random - All</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Random signs from all categories
@@ -211,7 +227,6 @@ export default function QuizPage() {
                       : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
                   }`}
                 >
-                  <Target className="w-8 h-8 mx-auto mb-2 text-purple-600" />
                   <h3 className="font-semibold mb-1">Category</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Random signs from one category
@@ -226,7 +241,6 @@ export default function QuizPage() {
                       : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
                   }`}
                 >
-                  <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-green-600" />
                   <h3 className="font-semibold mb-1">Custom</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Choose specific letters
@@ -336,7 +350,7 @@ export default function QuizPage() {
     const userAnswer = userAnswers[currentQuestionIndex];
 
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-black text-white">
         <Navigation />
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto">
@@ -436,7 +450,7 @@ export default function QuizPage() {
     const percentage = Math.round((results.correct / results.total) * 100);
 
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-black text-white">
         <Navigation />
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
@@ -462,22 +476,22 @@ export default function QuizPage() {
               <div className="mb-6">
                 {percentage === 100 && (
                   <p className="text-2xl font-semibold text-green-600 dark:text-green-400">
-                    Perfect! Outstanding work! 🎉
+                    Perfect! Outstanding work!
                   </p>
                 )}
                 {percentage >= 80 && percentage < 100 && (
                   <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
-                    Great job! Keep it up! 👏
+                    Great job! Keep it up!
                   </p>
                 )}
                 {percentage >= 60 && percentage < 80 && (
                   <p className="text-2xl font-semibold text-yellow-600 dark:text-yellow-400">
-                    Good effort! Practice makes perfect! 💪
+                    Good effort! Practice makes perfect!
                   </p>
                 )}
                 {percentage < 60 && (
                   <p className="text-2xl font-semibold text-orange-600 dark:text-orange-400">
-                    Keep practicing! You'll get there! 📚
+                    Keep practicing! You'll get there!
                   </p>
                 )}
               </div>

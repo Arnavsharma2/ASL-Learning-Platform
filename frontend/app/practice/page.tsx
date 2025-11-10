@@ -218,7 +218,7 @@ function PracticePageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
 
       {/* Main Content */}
@@ -438,7 +438,7 @@ function PracticePageContent() {
 
               <Card className="p-6 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
                 <p className="text-sm text-green-900 dark:text-green-100">
-                  <strong>🚀 Client-Side AI:</strong> ONNX model running in your browser!
+                  <strong>Client-Side AI:</strong> ONNX model running in your browser!
                   Recognizing alphabet letters A-Z
                 </p>
                 <p className="text-xs text-green-700 dark:text-green-300 mt-2">

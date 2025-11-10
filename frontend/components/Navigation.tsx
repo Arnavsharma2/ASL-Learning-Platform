@@ -16,49 +16,57 @@ export function Navigation() {
   };
 
   return (
-    <nav className="border-b bg-white dark:bg-gray-800">
-      <div className="container mx-auto px-4 py-4">
+    <nav className="border-b border-gray-800 bg-black">
+      <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <Link href="/">
-            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400 cursor-pointer">
-              ASL Learning
+            <h1 className="text-xl font-light tracking-tight cursor-pointer hover:text-gray-400 transition-colors">
+              ASL Learning Platform
             </h1>
           </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/practice">
-              <Button variant="outline">Practice</Button>
+          <div className="flex items-center gap-6">
+            {/* Functional Links */}
+            <Link href="/practice" className="text-sm hover:text-gray-400 transition-colors">
+              Practice
             </Link>
-            <Link href="/learn">
-              <Button variant="outline">Lessons</Button>
+            <Link href="/learn" className="text-sm hover:text-gray-400 transition-colors">
+              Lessons
             </Link>
-            <Link href="/quiz">
-              <Button variant="outline">Quiz</Button>
+            <Link href="/quiz" className="text-sm hover:text-gray-400 transition-colors">
+              Quiz
             </Link>
-            <Link href="/reference">
-              <Button variant="outline">Reference</Button>
+            <Link href="/reference" className="text-sm hover:text-gray-400 transition-colors">
+              Reference
             </Link>
-            <Link href="/settings">
-              <Button variant="outline">Settings</Button>
-            </Link>
+
+            {/* User Actions */}
             {!loading && (
               <>
                 {user ? (
                   <>
                     <Link href="/dashboard">
-                      <Button variant="outline">Dashboard</Button>
-                    </Link>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {user.email}
-                      </span>
-                      <Button variant="outline" onClick={handleSignOut}>
-                        Sign Out
+                      <Button variant="outline" className="border-gray-700 text-white hover:bg-gray-900">
+                        Dashboard
                       </Button>
-                    </div>
+                    </Link>
+                    <Link href="/settings">
+                      <Button variant="ghost" className="text-sm text-gray-400 hover:text-white">
+                        Settings
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      onClick={handleSignOut}
+                      className="text-sm text-gray-400 hover:text-white"
+                    >
+                      Sign Out
+                    </Button>
                   </>
                 ) : (
                   <Link href="/auth/login">
-                    <Button>Sign In</Button>
+                    <Button className="bg-white text-black hover:bg-gray-200">
+                      Sign In
+                    </Button>
                   </Link>
                 )}
               </>
@@ -69,4 +77,3 @@ export function Navigation() {
     </nav>
   );
 }
-

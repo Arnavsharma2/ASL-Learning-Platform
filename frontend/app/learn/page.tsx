@@ -126,7 +126,7 @@ export default function LearnPage() {
   const inProgressCount = lessons.filter(l => getLessonStatus(l.id) === 'in_progress').length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
 
       {/* Main Content */}
