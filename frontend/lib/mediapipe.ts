@@ -162,15 +162,28 @@ export function drawHands(
   canvasCtx: CanvasRenderingContext2D,
   results: MediaPipeResults,
   width: number,
-  height: number
+  height: number,
+  videoElement?: HTMLVideoElement
 ) {
   canvasCtx.save();
-  canvasCtx.clearRect(0, 0, width, height);
-
-  // Draw the video frame
-  if (results.image) {
-    canvasCtx.drawImage(results.image, 0, 0, width, height);
+  
+  // Determine if we have a video frame to draw
+  const hasVideoFrame = (videoElement && videoElement.readyState >= 2) || !!results.image;
+  
+  // Only clear if we have a new video frame to draw - prevents black screen during processing
+  if (hasVideoFrame) {
+    canvasCtx.clearRect(0, 0, width, height);
+    
+    // Draw the video frame - prefer videoElement (more reliable), fallback to results.image
+    if (videoElement && videoElement.readyState >= 2) {
+      // Video is loaded and has data - draw directly from video element
+      canvasCtx.drawImage(videoElement, 0, 0, width, height);
+    } else if (results.image) {
+      // Fallback to image from results
+      canvasCtx.drawImage(results.image, 0, 0, width, height);
+    }
   }
+  // If no video frame available, don't clear - keep previous frame visible to prevent black screen
 
   // Only draw landmarks if hands are detected
   if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {

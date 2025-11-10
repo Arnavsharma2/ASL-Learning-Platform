@@ -105,8 +105,8 @@ export function AdaptiveCameraFeed({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Draw the hands on canvas
-        drawHands(ctx, results, width, height);
+        // Draw the hands on canvas - pass video element to ensure video is always drawn
+        drawHands(ctx, results, width, height, videoRef.current || undefined);
 
         // Update hand count
         const currentHandCount = results.multiHandLandmarks?.length || 0;
