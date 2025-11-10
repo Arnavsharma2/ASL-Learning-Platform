@@ -29,6 +29,10 @@ export function Navigation() {
           </Link>
           <div className="flex items-center gap-6">
             {/* Functional Links */}
+            <Link href="/reference" className="text-sm hover:text-gray-400 transition-all relative group">
+              Reference
+              <span className="absolute -bottom-1 left-0 w-0 h-px bg-white/50 transition-all duration-300 group-hover:w-full" />
+            </Link>
             <Link href="/practice" className="text-sm hover:text-gray-400 transition-all relative group">
               Practice
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-white/50 transition-all duration-300 group-hover:w-full" />
@@ -45,10 +49,6 @@ export function Navigation() {
               Time Challenge
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-white/50 transition-all duration-300 group-hover:w-full" />
             </Link>
-            <Link href="/reference" className="text-sm hover:text-gray-400 transition-all relative group">
-              Reference
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-white/50 transition-all duration-300 group-hover:w-full" />
-            </Link>
 
             {/* User Actions */}
             {!loading && (
@@ -56,7 +56,7 @@ export function Navigation() {
                 {user ? (
                   <>
                     <Link href="/dashboard">
-                      <Button variant="outline" className="border-gray-700 text-white hover:bg-gray-900">
+                      <Button variant="outline" className="border-white/30 text-white hover:bg-gray-900 hover:border-white/50">
                         Dashboard
                       </Button>
                     </Link>

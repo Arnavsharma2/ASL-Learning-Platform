@@ -26,13 +26,15 @@ Next.js web application that provides interactive American Sign Language (ASL) l
 
 ## Controls
 
-- **Practice Mode**: Use webcam to practice any ASL sign with real-time recognition
+- **Practice Mode**: Use webcam to practice any ASL sign with real-time recognition (start/stop camera control)
+- **Time Challenge**: Race against the clock to sign letters as fast as possible with automatic progression
 - **Lessons**: Browse alphabet lessons, view instructions, and start guided practice
 - **Quiz**: Select quiz mode (random, category, or custom letters) and answer questions
 - **Reference**: Quick visual reference for all 26 ASL alphabet letters
 - **Dashboard**: View learning statistics, progress, and history (requires login)
-- **Settings**: Adjust recognition mode (Balanced, Max Accuracy, Max Performance)
-- **Navigation**: Switch between Practice, Lessons, Quiz, Reference, and Dashboard
+- **Navigation**: Switch between Practice, Time Challenge, Lessons, Quiz, Reference, and Dashboard
+
+**Note**: Recognition uses optimized balanced settings (2000ms inference throttle) for smooth video performance.
 
 ## Dependencies
 

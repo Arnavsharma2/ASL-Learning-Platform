@@ -27,6 +27,7 @@ export default function TimeChallengePage() {
   const [startTime, setStartTime] = useState<number>(0);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [finalTime, setFinalTime] = useState<number>(0);
+  const [correctCount, setCorrectCount] = useState<number>(0);
 
   // Countdown state
   const [countdownValue, setCountdownValue] = useState<number>(3);
@@ -149,6 +150,7 @@ export default function TimeChallengePage() {
     generateChallenge();
     setMode('countdown');
     setCountdownValue(3);
+    setCorrectCount(0);
 
     // Countdown
     const countdownInterval = setInterval(() => {
@@ -235,7 +237,8 @@ export default function TimeChallengePage() {
       // Check if detected sign matches target
       const targetLetter = challengeLetters[currentLetterIndex];
       if (prediction.sign === targetLetter && prediction.confidence >= 0.80) {
-        // Correct sign detected! Move to next letter
+        // Correct sign detected! Increment counter and move to next letter
+        setCorrectCount(prev => prev + 1);
         moveToNextLetter();
       }
     } catch (err) {
@@ -310,6 +313,7 @@ export default function TimeChallengePage() {
     setChallengeLetters([]);
     setElapsedTime(0);
     setFinalTime(0);
+    setCorrectCount(0);
     setDetectedSign('');
     setConfidence(0);
     setShowHint(false);
@@ -551,6 +555,22 @@ export default function TimeChallengePage() {
                     </Badge>
                   </div>
                 </Card>
+
+                {/* Correct Count */}
+                <Card className="p-6 bg-gradient-to-r from-green-900/30 to-emerald-900/30 border-green-800/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-400 flex items-center gap-2">
+                      <Target className="w-4 h-4" />
+                      Correct Signs
+                    </span>
+                  </div>
+                  <div className="text-5xl font-bold text-green-400 font-mono">
+                    {correctCount}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-2">
+                    {challengeLetters.length > 0 ? `${Math.round((correctCount / challengeLetters.length) * 100)}% accuracy` : ''}
+                  </div>
+                </Card>
               </div>
             </div>
           )}
@@ -571,15 +591,25 @@ export default function TimeChallengePage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="grid grid-cols-3 gap-4 mb-6">
                     <div className="bg-gray-900/50 rounded-lg p-4">
                       <p className="text-sm text-gray-400">Letters</p>
                       <p className="text-2xl font-bold">{challengeLetters.length}</p>
+                    </div>
+                    <div className="bg-green-900/50 rounded-lg p-4">
+                      <p className="text-sm text-gray-400">Correct</p>
+                      <p className="text-2xl font-bold text-green-400">{correctCount}</p>
                     </div>
                     <div className="bg-gray-900/50 rounded-lg p-4">
                       <p className="text-sm text-gray-400">Avg Per Letter</p>
                       <p className="text-2xl font-bold">{(finalTime / challengeLetters.length / 1000).toFixed(2)}s</p>
                     </div>
+                  </div>
+                  <div className="bg-gray-900/50 rounded-lg p-4 mb-6">
+                    <p className="text-sm text-gray-400 mb-1">Accuracy</p>
+                    <p className="text-3xl font-bold text-green-400">
+                      {challengeLetters.length > 0 ? Math.round((correctCount / challengeLetters.length) * 100) : 0}%
+                    </p>
                   </div>
 
                   <div className="flex gap-4">
