@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function Home() {
   const { user } = useAuth();
@@ -73,7 +74,7 @@ export default function Home() {
               <br />
               <span className="font-normal">with Computer Vision</span>
             </h1>
-          </motion.div>
+            </motion.div>
 
           {/* Call to Action */}
           <motion.section
@@ -135,27 +136,21 @@ export default function Home() {
               Built with:
             </h2>
             
-            <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
               {/* Frontend */}
               <div className="text-center">
                 <h3 className="text-2xl font-normal mb-8 text-gray-300">Frontend</h3>
                 <div className="flex flex-wrap justify-center gap-6 items-center">
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
-                      <span className="text-2xl font-bold text-black">N</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" alt="Next.js" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">Next.js</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">TS</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" alt="TypeScript" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">TypeScript</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-cyan-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">TW</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" alt="Tailwind" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">Tailwind</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
@@ -171,9 +166,7 @@ export default function Home() {
                     <span className="text-xs text-gray-400">ONNX Runtime</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">SB</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg" alt="Supabase" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">Supabase</span>
                   </div>
                 </div>
@@ -184,27 +177,19 @@ export default function Home() {
                 <h3 className="text-2xl font-normal mb-8 text-gray-300">Backend</h3>
                 <div className="flex flex-wrap justify-center gap-6 items-center">
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">FA</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" alt="FastAPI" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">FastAPI</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-orange-400 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">PY</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">Python</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-red-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">PT</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg" alt="PyTorch" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">PyTorch</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">PG</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" alt="PostgreSQL" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">PostgreSQL</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
@@ -214,9 +199,7 @@ export default function Home() {
                     <span className="text-xs text-gray-400">SQLAlchemy</span>
                   </div>
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">CV</span>
-                    </div>
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/opencv/opencv-original.svg" alt="OpenCV" className="w-16 h-16" />
                     <span className="text-xs text-gray-400">OpenCV</span>
                   </div>
                 </div>
@@ -235,61 +218,117 @@ export default function Home() {
               Training Graphs
             </h2>
             
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              <Card className="p-6 bg-gray-900 border-gray-800">
-                <h3 className="text-xl font-normal mb-4 text-gray-300">Model Performance</h3>
-                <div className="space-y-2 text-sm text-gray-400">
-                  <div className="flex justify-between">
-                    <span>Test Accuracy:</span>
-                    <span className="text-green-400 font-semibold">98.98%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Model Type:</span>
-                    <span className="text-white">MLP (Multi-Layer Perceptron)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Input Features:</span>
-                    <span className="text-white">63 (21 landmarks × 3 coords)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Output Classes:</span>
-                    <span className="text-white">28 (A-Z + del + space)</span>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-800">
-                    <p className="text-xs text-gray-500">
-                      Trained on Kaggle ASL Alphabet dataset with PyTorch, exported to ONNX for browser inference.
-                    </p>
-                  </div>
-                </div>
-              </Card>
+            {/* Training Data */}
+            {(() => {
+              // Training history data (87 epochs)
+              const trainLoss = [0.850, 0.341, 0.288, 0.256, 0.234, 0.225, 0.210, 0.205, 0.191, 0.189, 0.177, 0.181, 0.175, 0.170, 0.166, 0.160, 0.164, 0.157, 0.159, 0.153, 0.150, 0.152, 0.145, 0.140, 0.141, 0.135, 0.134, 0.134, 0.135, 0.133, 0.130, 0.132, 0.126, 0.124, 0.127, 0.123, 0.128, 0.121, 0.122, 0.123, 0.118, 0.118, 0.115, 0.117, 0.113, 0.113, 0.120, 0.115, 0.111, 0.115, 0.114, 0.111, 0.109, 0.107, 0.109, 0.109, 0.115, 0.101, 0.105, 0.111, 0.102, 0.107, 0.107, 0.099, 0.100, 0.105, 0.104, 0.104, 0.100, 0.098, 0.099, 0.096, 0.102, 0.096, 0.095, 0.101, 0.094, 0.095, 0.095, 0.096, 0.097, 0.098, 0.097, 0.093];
+              const trainAcc = [76.62, 89.58, 91.27, 92.27, 93.03, 93.35, 93.79, 94.00, 94.34, 94.36, 94.85, 94.68, 94.82, 95.11, 95.05, 95.24, 95.17, 95.45, 95.35, 95.58, 95.78, 95.54, 95.95, 95.97, 95.85, 96.08, 96.08, 96.20, 96.11, 96.21, 96.19, 96.15, 96.34, 96.37, 96.28, 96.48, 96.30, 96.46, 96.53, 96.35, 96.59, 96.56, 96.62, 96.64, 96.76, 96.67, 96.57, 96.68, 96.76, 96.67, 96.66, 96.85, 96.84, 96.85, 96.90, 96.86, 96.71, 97.06, 96.90, 96.86, 96.98, 96.87, 96.85, 97.02, 97.09, 97.00, 97.05, 96.92, 97.15, 97.14, 97.20, 97.15, 97.07, 97.34, 97.16, 96.97, 97.26, 97.28, 97.30, 97.18, 97.20, 97.19, 97.23, 97.38];
+              const valLoss = [0.186, 0.161, 0.173, 0.119, 0.120, 0.099, 0.100, 0.071, 0.071, 0.071, 0.069, 0.066, 0.073, 0.062, 0.056, 0.076, 0.060, 0.062, 0.071, 0.053, 0.050, 0.057, 0.066, 0.050, 0.055, 0.063, 0.059, 0.077, 0.047, 0.061, 0.050, 0.057, 0.042, 0.049, 0.053, 0.044, 0.050, 0.045, 0.055, 0.044, 0.042, 0.041, 0.039, 0.044, 0.077, 0.041, 0.045, 0.044, 0.063, 0.043, 0.054, 0.037, 0.038, 0.042, 0.039, 0.036, 0.039, 0.037, 0.038, 0.040, 0.035, 0.036, 0.034, 0.038, 0.040, 0.039, 0.044, 0.034, 0.033, 0.067, 0.033, 0.037, 0.039, 0.051, 0.036, 0.036, 0.039, 0.036, 0.033, 0.035, 0.035, 0.039, 0.034, 0.033];
+              const valAcc = [94.47, 95.16, 94.39, 96.71, 96.09, 97.38, 97.21, 98.05, 97.99, 97.98, 98.06, 98.29, 97.95, 98.46, 98.40, 97.68, 98.27, 98.18, 97.95, 98.53, 98.66, 98.35, 98.00, 98.68, 98.39, 98.25, 97.86, 97.67, 98.79, 98.13, 98.47, 98.08, 98.90, 98.49, 98.35, 98.54, 98.59, 98.64, 98.24, 98.82, 98.79, 98.94, 98.88, 98.79, 97.25, 98.92, 98.75, 98.65, 97.89, 98.81, 98.41, 98.92, 98.87, 98.86, 98.95, 98.92, 98.94, 98.94, 98.85, 98.81, 98.99, 98.96, 99.13, 98.90, 98.75, 98.89, 98.69, 99.13, 99.18, 97.33, 99.15, 98.98, 98.91, 98.35, 99.11, 98.98, 98.83, 99.11, 99.10, 99.01, 99.08, 98.82, 99.06, 99.08];
+              
+              const chartData = trainLoss.map((_, i) => ({
+                epoch: i + 1,
+                trainLoss: trainLoss[i],
+                valLoss: valLoss[i],
+                trainAcc: trainAcc[i],
+                valAcc: valAcc[i],
+              }));
 
-              <Card className="p-6 bg-gray-900 border-gray-800">
-                <h3 className="text-xl font-normal mb-4 text-gray-300">Training Details</h3>
-                <div className="space-y-2 text-sm text-gray-400">
-                  <div className="flex justify-between">
-                    <span>Dataset:</span>
-                    <span className="text-white">ASL Alphabet (Kaggle)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Training Samples:</span>
-                    <span className="text-white">87,000+ images</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Validation Split:</span>
-                    <span className="text-white">20%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Optimization:</span>
-                    <span className="text-white">Adam Optimizer</span>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-800">
-                    <p className="text-xs text-gray-500">
-                      Model optimized for real-time inference with GPU acceleration via WebGL.
-                    </p>
-                  </div>
+              return (
+                <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                  {/* Loss Chart */}
+                  <Card className="p-6 bg-gray-900 border-gray-800">
+                    <h3 className="text-xl font-normal mb-6 text-gray-300">Training & Validation Loss</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis 
+                          dataKey="epoch" 
+                          stroke="#9CA3AF"
+                          style={{ fontSize: '12px' }}
+                          label={{ value: 'Epoch', position: 'insideBottom', offset: -5, style: { fill: '#9CA3AF' } }}
+                        />
+                        <YAxis 
+                          stroke="#9CA3AF"
+                          style={{ fontSize: '12px' }}
+                          label={{ value: 'Loss', angle: -90, position: 'insideLeft', style: { fill: '#9CA3AF' } }}
+                        />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
+                          labelStyle={{ color: '#F3F4F6' }}
+                        />
+                        <Legend wrapperStyle={{ color: '#9CA3AF', fontSize: '12px' }} />
+                        <Line 
+                          type="monotone" 
+                          dataKey="trainLoss" 
+                          stroke="#3B82F6" 
+                          strokeWidth={2}
+                          name="Training Loss"
+                          dot={false}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="valLoss" 
+                          stroke="#10B981" 
+                          strokeWidth={2}
+                          name="Validation Loss"
+                          dot={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </Card>
+
+                  {/* Accuracy Chart */}
+                  <Card className="p-6 bg-gray-900 border-gray-800">
+                    <h3 className="text-xl font-normal mb-6 text-gray-300">Training & Validation Accuracy</h3>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis 
+                          dataKey="epoch" 
+                          stroke="#9CA3AF"
+                          style={{ fontSize: '12px' }}
+                          label={{ value: 'Epoch', position: 'insideBottom', offset: -5, style: { fill: '#9CA3AF' } }}
+                        />
+                        <YAxis 
+                          stroke="#9CA3AF"
+                          style={{ fontSize: '12px' }}
+                          domain={[90, 100]}
+                          label={{ value: 'Accuracy (%)', angle: -90, position: 'insideLeft', style: { fill: '#9CA3AF' } }}
+                        />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
+                          labelStyle={{ color: '#F3F4F6' }}
+                          formatter={(value: number) => `${value.toFixed(2)}%`}
+                        />
+                        <Legend wrapperStyle={{ color: '#9CA3AF', fontSize: '12px' }} />
+                        <Line 
+                          type="monotone" 
+                          dataKey="trainAcc" 
+                          stroke="#3B82F6" 
+                          strokeWidth={2}
+                          name="Training Accuracy"
+                          dot={false}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="valAcc" 
+                          stroke="#10B981" 
+                          strokeWidth={2}
+                          name="Validation Accuracy"
+                          dot={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                    <div className="mt-4 pt-4 border-t border-gray-800">
+                      <p className="text-xs text-gray-500 text-center">
+                        Best Validation Accuracy: <span className="text-green-400 font-semibold">99.18%</span>
+                      </p>
+                    </div>
+                  </Card>
                 </div>
-              </Card>
-            </div>
+              );
+            })()}
           </motion.section>
 
           {/* Flowchart Section */}
@@ -300,76 +339,111 @@ export default function Home() {
             className="mb-32"
           >
             <h2 className="text-4xl md:text-5xl font-light text-center mb-16">
-              Flowchart
+              Recognition Pipeline
             </h2>
             
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <Card className="p-8 bg-gray-900 border-gray-800">
-                <div className="space-y-6">
-                  {/* Flow steps */}
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-bold">1</span>
+                <div className="relative">
+                  {/* Step 1 */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg border-2 border-blue-400">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">Webcam Input</h3>
-                      <p className="text-sm text-gray-400">User shows hand sign to camera</p>
-                    </div>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">Webcam Input</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">User shows hand sign to camera in real-time</p>
                   </div>
 
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white font-bold">2</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">MediaPipe Detection</h3>
-                      <p className="text-sm text-gray-400">Extracts 21 hand landmarks (x, y, z coordinates)</p>
-                    </div>
+                  {/* Arrow Down */}
+                  <div className="flex justify-center mb-8">
+                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
                   </div>
 
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white font-bold">3</span>
+                  {/* Step 2 */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg border-2 border-purple-400">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">Feature Extraction</h3>
-                      <p className="text-sm text-gray-400">Flattens landmarks to 63 features (21 × 3)</p>
-                    </div>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">MediaPipe Detection</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">Extracts 21 hand landmarks (x, y, z coordinates)</p>
                   </div>
 
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white font-bold">4</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">ONNX Inference</h3>
-                      <p className="text-sm text-gray-400">MLP model predicts sign with confidence score</p>
-                    </div>
+                  {/* Arrow Down */}
+                  <div className="flex justify-center mb-8">
+                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
                   </div>
 
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white font-bold">5</span>
+                  {/* Step 3 */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-orange-400">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">Display Result</h3>
-                      <p className="text-sm text-gray-400">Shows detected letter (A-Z) and confidence percentage</p>
-                    </div>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">Feature Extraction</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">Flattens landmarks to 63 features (21 × 3 coordinates)</p>
                   </div>
 
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white font-bold">6</span>
+                  {/* Arrow Down */}
+                  <div className="flex justify-center mb-8">
+                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg border-2 border-green-400">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">Progress Tracking</h3>
-                      <p className="text-sm text-gray-400">Saves practice session to database (if logged in)</p>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">ONNX Inference</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">MLP model predicts sign (A-Z) with confidence score using GPU acceleration</p>
+                  </div>
+
+                  {/* Arrow Down */}
+                  <div className="flex justify-center mb-8">
+                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+
+                  {/* Step 5 */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg border-2 border-red-400">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </div>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">Display Result</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">Shows detected letter (A-Z) and confidence percentage in real-time</p>
+                  </div>
+
+                  {/* Arrow Down */}
+                  <div className="flex justify-center mb-8">
+                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+
+                  {/* Step 6 */}
+                  <div className="flex flex-col items-center">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg border-2 border-teal-400">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">Progress Tracking</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">Saves practice session to database via FastAPI (if logged in)</p>
                   </div>
                 </div>
               </Card>
@@ -387,130 +461,151 @@ export default function Home() {
               Backend Architecture
             </h2>
             
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <Card className="p-8 bg-gray-900 border-gray-800">
-                <div className="space-y-6">
-                  {/* Frontend to Backend */}
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-xs font-bold">FE</span>
+                <div className="relative">
+                  {/* Frontend Client */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg border-2 border-blue-400">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">Frontend API Client</h3>
-                      <p className="text-sm text-gray-400">Sends requests via lib/api.ts</p>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">Frontend API Client</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">lib/api.ts sends HTTP requests</p>
+                  </div>
+
+                  {/* Arrow Down */}
+                  <div className="flex justify-center mb-8">
+                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+
+                  {/* FastAPI Server */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg border-2 border-green-400">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" alt="FastAPI" className="w-12 h-12" />
+                    </div>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">FastAPI Server</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">REST API endpoints on port 8000</p>
+                  </div>
+
+                  {/* Arrow Down */}
+                  <div className="flex justify-center mb-8">
+                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  </div>
+
+                  {/* Routes - Split into two columns */}
+                  <div className="grid md:grid-cols-2 gap-8 mb-8">
+                    {/* Lessons Route */}
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg border-2 border-cyan-400">
+                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold mt-4 mb-2">Lessons API</h3>
+                      <p className="text-sm text-gray-400 text-center">CRUD operations for lessons</p>
+                    </div>
+
+                    {/* Progress Route */}
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg border-2 border-yellow-400">
+                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-semibold mt-4 mb-2">Progress API</h3>
+                      <p className="text-sm text-gray-400 text-center">Track user learning progress</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white text-xs font-bold">API</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">FastAPI Server</h3>
-                      <p className="text-sm text-gray-400">REST API endpoints on port 8000</p>
-                    </div>
-                  </div>
-
-                  {/* Routes Branch */}
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white text-xs font-bold">RT</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">API Routes</h3>
-                      <p className="text-sm text-gray-400">lessons.py & progress.py</p>
+                  {/* Arrows converging */}
+                  <div className="flex justify-center mb-8">
+                    <div className="relative w-32 h-16">
+                      <svg className="absolute left-0 top-0 w-16 h-16 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                      <svg className="absolute right-0 top-0 w-16 h-16 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
                     </div>
                   </div>
 
-                  {/* Two parallel paths */}
-                  <div className="grid md:grid-cols-2 gap-6 ml-20">
-                    {/* Lessons Path */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-1 h-8 bg-gray-700"></div>
-                        <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center flex-shrink-0 -ml-4">
-                          <span className="text-white text-xs font-bold">L</span>
-                        </div>
-                        <div>
-                          <h4 className="text-base font-semibold mb-1">Lessons API</h4>
-                          <p className="text-xs text-gray-400">CRUD operations</p>
-                        </div>
-                      </div>
+                  {/* Database */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg border-2 border-indigo-400">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" alt="PostgreSQL" className="w-12 h-12" />
                     </div>
-
-                    {/* Progress Path */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-1 h-8 bg-gray-700"></div>
-                        <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center flex-shrink-0 -ml-4">
-                          <span className="text-white text-xs font-bold">P</span>
-                        </div>
-                        <div>
-                          <h4 className="text-base font-semibold mb-1">Progress API</h4>
-                          <p className="text-xs text-gray-400">Track user progress</p>
-                        </div>
-                      </div>
-                    </div>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">Supabase PostgreSQL</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">Stores lessons and user progress data</p>
                   </div>
 
-                  {/* Both converge to Database */}
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white text-xs font-bold">DB</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">Supabase PostgreSQL</h3>
-                      <p className="text-sm text-gray-400">Stores lessons and user progress</p>
-                    </div>
+                  {/* Arrow Down */}
+                  <div className="flex justify-center mb-8">
+                    <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
                   </div>
 
-                  {/* SQLAlchemy Models */}
-                  <div className="flex items-center gap-4 ml-6">
-                    <div className="w-1 h-12 bg-gray-700"></div>
-                    <div className="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center flex-shrink-0 -ml-6">
-                      <span className="text-white text-xs font-bold">ORM</span>
+                  {/* SQLAlchemy ORM */}
+                  <div className="flex flex-col items-center mb-12">
+                    <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg border-2 border-teal-400">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1">SQLAlchemy ORM</h3>
-                      <p className="text-sm text-gray-400">Database models (Lessons, UserProgress)</p>
-                    </div>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">SQLAlchemy ORM</h3>
+                    <p className="text-sm text-gray-400 text-center max-w-xs">Database models (Lessons, UserProgress)</p>
                   </div>
 
-                  {/* Training Pipeline (separate branch) */}
-                  <div className="mt-8 pt-8 border-t border-gray-800">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-xs font-bold">ML</span>
+                  {/* Training Pipeline - Separate section */}
+                  <div className="border-t border-gray-800 pt-8">
+                    <div className="flex flex-col items-center mb-8">
+                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg border-2 border-red-400">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg" alt="PyTorch" className="w-12 h-12" />
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold mb-1">Training Pipeline</h3>
-                        <p className="text-sm text-gray-400">PyTorch model training & ONNX export</p>
-                      </div>
+                      <h3 className="text-xl font-semibold mt-4 mb-2">Training Pipeline</h3>
+                      <p className="text-sm text-gray-400 text-center max-w-xs">PyTorch model training & ONNX export</p>
                     </div>
 
-                    <div className="flex items-center gap-4 ml-6 mt-4">
-                      <div className="w-1 h-12 bg-gray-700"></div>
-                      <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 -ml-6">
-                        <span className="text-white text-xs font-bold">PT</span>
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold mb-1">PyTorch Training</h3>
-                        <p className="text-sm text-gray-400">train.py - MLP model training</p>
-                      </div>
+                    {/* Arrow Down */}
+                    <div className="flex justify-center mb-8">
+                      <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
                     </div>
 
-                    <div className="flex items-center gap-4 ml-6">
-                      <div className="w-1 h-12 bg-gray-700"></div>
-                      <div className="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 -ml-6">
-                        <span className="text-white text-xs font-bold">EX</span>
+                    {/* PyTorch Training */}
+                    <div className="flex flex-col items-center mb-8">
+                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg border-2 border-orange-400">
+                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold mb-1">ONNX Export</h3>
-                        <p className="text-sm text-gray-400">Exported to frontend/public/models/</p>
+                      <h3 className="text-xl font-semibold mt-4 mb-2">PyTorch Training</h3>
+                      <p className="text-sm text-gray-400 text-center max-w-xs">train.py - MLP model training on 87K+ samples</p>
+                    </div>
+
+                    {/* Arrow Down */}
+                    <div className="flex justify-center mb-8">
+                      <svg className="w-8 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                    </div>
+
+                    {/* ONNX Export */}
+                    <div className="flex flex-col items-center">
+                      <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg border-2 border-amber-400">
+                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
                       </div>
+                      <h3 className="text-xl font-semibold mt-4 mb-2">ONNX Export</h3>
+                      <p className="text-sm text-gray-400 text-center max-w-xs">Exported to frontend/public/models/ for browser inference</p>
                     </div>
                   </div>
                 </div>
