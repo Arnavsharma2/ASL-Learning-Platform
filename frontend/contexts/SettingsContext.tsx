@@ -19,23 +19,24 @@ interface SettingsContextType {
   resetSettings: () => void;
 }
 
+// Always use balanced settings with 2000ms throttle for better video performance
 const defaultSettings: PerformanceSettings = {
   mode: 'balanced',
   videoResolution: '640x480',
   frameRate: 30,
   modelComplexity: 0,
-  inferenceThrottleMs: 250,
-  minConfidence: 0.8,
+  inferenceThrottleMs: 2000, // 2 seconds - slower detection for better video quality
+  minConfidence: 0.75,
 };
 
-// Preset configurations
+// Preset configurations (kept for compatibility but not used)
 export const performancePresets: Record<PerformanceMode, PerformanceSettings> = {
   max_performance: {
     mode: 'max_performance',
     videoResolution: '640x480',
     frameRate: 30,
     modelComplexity: 0,
-    inferenceThrottleMs: 0, // Use server-side processing (no client inference)
+    inferenceThrottleMs: 0,
     minConfidence: 0.7,
   },
   balanced: {
@@ -43,7 +44,7 @@ export const performancePresets: Record<PerformanceMode, PerformanceSettings> = 
     videoResolution: '640x480',
     frameRate: 30,
     modelComplexity: 0,
-    inferenceThrottleMs: 500, // Moderate client-side inference
+    inferenceThrottleMs: 2000, // 2 seconds
     minConfidence: 0.75,
   },
   max_accuracy: {
@@ -51,7 +52,7 @@ export const performancePresets: Record<PerformanceMode, PerformanceSettings> = 
     videoResolution: '640x480',
     frameRate: 30,
     modelComplexity: 1,
-    inferenceThrottleMs: 200, // Fast client-side real-time inference
+    inferenceThrottleMs: 200,
     minConfidence: 0.8,
   },
 };
@@ -59,36 +60,16 @@ export const performancePresets: Record<PerformanceMode, PerformanceSettings> = 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<PerformanceSettings>(defaultSettings);
-  const [isInitialized, setIsInitialized] = useState(false);
+  // Always use balanced settings with 2000ms throttle - no user customization
+  const [settings] = useState<PerformanceSettings>(defaultSettings);
 
-  // Load settings from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('asl-performance-settings');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setSettings(parsed);
-      } catch (error) {
-        console.error('Failed to parse stored settings:', error);
-      }
-    }
-    setIsInitialized(true);
-  }, []);
-
-  // Save settings to localStorage whenever they change
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('asl-performance-settings', JSON.stringify(settings));
-    }
-  }, [settings, isInitialized]);
-
-  const updateSettings = (newSettings: Partial<PerformanceSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
+  // Settings are now fixed - no updates or localStorage needed
+  const updateSettings = () => {
+    // No-op: settings are fixed
   };
 
   const resetSettings = () => {
-    setSettings(defaultSettings);
+    // No-op: settings are fixed
   };
 
   return (

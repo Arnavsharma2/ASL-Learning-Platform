@@ -119,14 +119,6 @@ export default function Home() {
               <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
                 Dashboard
               </Link>
-              {user && (
-                <>
-                  <span className="text-gray-600">•</span>
-                  <Link href="/settings" className="text-gray-400 hover:text-white transition-colors">
-                    Settings
-                  </Link>
-                </>
-              )}
             </div>
           </motion.section>
 

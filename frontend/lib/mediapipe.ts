@@ -75,6 +75,7 @@ export async function initializeHands(
 export async function startCamera(
   videoElement: HTMLVideoElement,
   hands: any,
+  canvasElement?: HTMLCanvasElement,
 ): Promise<MediaStream> {
   const stream = await navigator.mediaDevices.getUserMedia({
     video: { width: 640, height: 480 },
@@ -82,6 +83,33 @@ export async function startCamera(
 
   videoElement.srcObject = stream;
   await videoElement.play();
+
+  // Continuous video drawing loop - ensures video is always displayed regardless of MediaPipe processing
+  let videoDrawAnimationId: number | null = null;
+  let shouldDrawVideo = true;
+
+  if (canvasElement) {
+    const drawVideoContinuously = () => {
+      if (!videoElement.srcObject || !shouldDrawVideo || !canvasElement) {
+        if (videoDrawAnimationId) {
+          cancelAnimationFrame(videoDrawAnimationId);
+          videoDrawAnimationId = null;
+        }
+        return;
+      }
+
+      const ctx = canvasElement.getContext('2d');
+      if (ctx && videoElement.readyState >= 2) {
+        // Continuously draw video frame - this runs independently of MediaPipe
+        ctx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+      }
+
+      if (shouldDrawVideo) {
+        videoDrawAnimationId = requestAnimationFrame(drawVideoContinuously);
+      }
+    };
+    videoDrawAnimationId = requestAnimationFrame(drawVideoContinuously);
+  }
 
   // Performance optimization: limit MediaPipe to ~20 FPS (50ms between frames)
   // This prevents overwhelming the GPU/CPU while still feeling responsive
@@ -154,9 +182,14 @@ export async function startCamera(
   // Store cleanup function on video element for later
   (videoElement as any).__stopFrameProcessing = () => {
     shouldContinue = false;
+    shouldDrawVideo = false;
     if (animationFrameId) {
       cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
+    }
+    if (videoDrawAnimationId) {
+      cancelAnimationFrame(videoDrawAnimationId);
+      videoDrawAnimationId = null;
     }
   };
 
@@ -165,6 +198,8 @@ export async function startCamera(
 
 /**
  * Draw hand landmarks on canvas
+ * Note: Video is now drawn continuously in a separate loop for 100% uptime.
+ * This function is kept for compatibility but video drawing is handled elsewhere.
  */
 export function drawHands(
   canvasCtx: CanvasRenderingContext2D,
@@ -173,37 +208,10 @@ export function drawHands(
   height: number,
   videoElement?: HTMLVideoElement
 ) {
-  canvasCtx.save();
-  
-  // Determine if we have a video frame to draw
-  const hasVideoFrame = (videoElement && videoElement.readyState >= 2) || !!results.image;
-  
-  // Only clear if we have a new video frame to draw - prevents black screen during processing
-  if (hasVideoFrame) {
-    canvasCtx.clearRect(0, 0, width, height);
-    
-    // Draw the video frame - prefer videoElement (more reliable), fallback to results.image
-    if (videoElement && videoElement.readyState >= 2) {
-      // Video is loaded and has data - draw directly from video element
-      canvasCtx.drawImage(videoElement, 0, 0, width, height);
-    } else if (results.image) {
-      // Fallback to image from results
-      canvasCtx.drawImage(results.image, 0, 0, width, height);
-    }
-  }
-  // If no video frame available, don't clear - keep previous frame visible to prevent black screen
-
-  // Only draw landmarks if hands are detected
-  if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-    for (const landmarks of results.multiHandLandmarks) {
-      // Draw connections
-      drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS);
-      // Draw landmarks
-      drawLandmarks(canvasCtx, landmarks);
-    }
-  }
-
-  canvasCtx.restore();
+  // Video is drawn continuously in startCamera() for 100% uptime
+  // This function is kept for compatibility but doesn't need to draw video
+  // Hand landmarks and connections are not drawn - only video is displayed
+  // (Landmarks are still detected and used for recognition, just not visualized)
 }
 
 // Hand connection lines (MediaPipe hand model)

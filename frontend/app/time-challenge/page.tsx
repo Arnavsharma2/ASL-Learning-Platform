@@ -9,10 +9,13 @@ import { initializeHands, startCamera, drawHands, MediaPipeResults } from '@/lib
 import onnxInference from '@/lib/onnx-inference';
 import { HandLandmarks } from '@/lib/mediapipe';
 import { Trophy, Clock, Target } from 'lucide-react';
+import { useSettings } from '@/contexts/SettingsContext';
 
 type ChallengeMode = 'setup' | 'countdown' | 'challenge' | 'results';
 
 export default function TimeChallengePage() {
+  const { settings } = useSettings();
+  
   // Mode and configuration
   const [mode, setMode] = useState<ChallengeMode>('setup');
   const [numLetters, setNumLetters] = useState<number>(10);
@@ -41,7 +44,8 @@ export default function TimeChallengePage() {
   const [confidence, setConfidence] = useState<number>(0);
   const lastInferenceRef = useRef<number>(0);
   const isProcessingRef = useRef<boolean>(false);
-  const INFERENCE_THROTTLE_MS = 100; // 10 FPS
+  // Use settings throttle value (2000ms for balanced mode)
+  const INFERENCE_THROTTLE_MS = settings.inferenceThrottleMs;
 
   // Timeout state (15 seconds per letter)
   const [letterStartTime, setLetterStartTime] = useState<number>(0);
@@ -172,7 +176,8 @@ export default function TimeChallengePage() {
       const hands = await initializeHands(handleHandDetection);
       handsRef.current = hands;
 
-      const stream = await startCamera(videoRef.current, hands);
+      // Start camera with continuous video drawing for 100% uptime
+      const stream = await startCamera(videoRef.current, hands, canvasRef.current);
       streamRef.current = stream;
       setCameraActive(true);
     } catch (err) {

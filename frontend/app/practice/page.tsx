@@ -39,8 +39,8 @@ function PracticePageContent() {
   const [sessionCount, setSessionCount] = useState(0);
   const isProcessingRef = useRef<boolean>(false);
 
-  // Performance optimization: throttle inference to max 10 FPS (100ms between calls)
-  const INFERENCE_THROTTLE_MS = 100;
+  // Use settings throttle value (2000ms for balanced mode)
+  const INFERENCE_THROTTLE_MS = settings.inferenceThrottleMs;
   const [modelLoading, setModelLoading] = useState(true);
   const [modelError, setModelError] = useState<string | null>(null);
 
@@ -119,6 +119,9 @@ function PracticePageContent() {
 
       lastInferenceRef.current = now;
       isProcessingRef.current = true;
+
+      // Run inference asynchronously to avoid blocking video rendering
+      // The video continues to render while inference runs in the background
 
       // Performance monitoring: track FPS
       frameCountRef.current++;

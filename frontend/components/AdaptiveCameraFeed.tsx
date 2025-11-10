@@ -90,7 +90,8 @@ export function AdaptiveCameraFeed({
   const serverErrorCountRef = useRef<number>(0);
   const currentLandmarksRef = useRef<any[] | null>(null); // Store current landmarks for continuous drawing
 
-  const isServerMode = settings.mode === 'max_performance';
+  // Always use client mode (balanced) - server mode disabled
+  const isServerMode = false;
 
   // Client-side real-time processing
   const initializeClientMode = useCallback(async () => {
@@ -125,8 +126,8 @@ export function AdaptiveCameraFeed({
 
       handsRef.current = hands;
 
-      // Start camera
-      const stream = await startCamera(videoRef.current, hands);
+      // Start camera with continuous video drawing
+      const stream = await startCamera(videoRef.current, hands, canvasRef.current);
       streamRef.current = stream;
       setError(null);
     } catch (err: any) {
@@ -185,13 +186,8 @@ export function AdaptiveCameraFeed({
           // Draw video frame
           ctx.drawImage(videoRef.current, 0, 0, width, height);
 
-          // Draw landmarks on top if we have them
-          if (currentLandmarksRef.current && currentLandmarksRef.current.length > 0) {
-            for (const landmarks of currentLandmarksRef.current) {
-              drawConnectors(ctx, landmarks, HAND_CONNECTIONS);
-              drawLandmarksOnly(ctx, landmarks, width, height);
-            }
-          }
+          // Hand landmarks are not drawn - only video is displayed
+          // (Landmarks are still detected and used for recognition, just not visualized)
         }
 
         animationFrameId = requestAnimationFrame(drawVideoFrame);
