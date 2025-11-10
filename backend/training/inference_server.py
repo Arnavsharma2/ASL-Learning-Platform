@@ -41,10 +41,23 @@ class PredictionOutput(BaseModel):
 
 
 def load_model(model_path: str = "models/best_model.pth"):
-    """Load the trained PyTorch model"""
+    """Load the trained PyTorch model with GPU acceleration if available"""
     global model, labels, device
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # Determine best available device (prioritize GPU)
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+        print(f"🚀 GPU Acceleration: CUDA available")
+        print(f"   Device: {torch.cuda.get_device_name(0)}")
+        print(f"   Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
+    elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+        device = torch.device('mps')  # Apple Silicon GPU
+        print(f"🚀 GPU Acceleration: Apple Metal (MPS) available")
+    else:
+        device = torch.device('cpu')
+        print(f"⚙️  Using CPU (GPU not available)")
+        print(f"   For better performance, ensure CUDA (NVIDIA) or MPS (Apple Silicon) is available")
+
     print(f"Loading model on device: {device}")
 
     # Load checkpoint
@@ -66,9 +79,9 @@ def load_model(model_path: str = "models/best_model.pth"):
         'num_classes': checkpoint['num_classes']
     }
 
-    print(f"Model loaded: {checkpoint['model_type']}")
-    print(f"Number of classes: {checkpoint['num_classes']}")
-    print(f"Signs: {list(labels['label_to_idx'].keys())}")
+    print(f"✓ Model loaded: {checkpoint['model_type']}")
+    print(f"  Number of classes: {checkpoint['num_classes']}")
+    print(f"  Signs: {list(labels['label_to_idx'].keys())}")
 
 
 @app.on_event("startup")

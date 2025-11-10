@@ -48,16 +48,32 @@ class ONNXInference {
       }
       this.labels = await labelsResponse.json();
 
-      // Load ONNX model
+      // Prioritize GPU acceleration (WebGL) over CPU (WASM)
+      // WebGL uses GPU for faster inference, WASM is CPU fallback
+      const executionProviders = ['webgl', 'wasm'];
+      
+      // Load ONNX model with GPU-optimized settings
       this.session = await ort.InferenceSession.create('/models/model.onnx', {
-        executionProviders: ['webgl', 'wasm'], // Try WebGL (GPU) first, fallback to WASM (CPU)
-        graphOptimizationLevel: 'all',
+        executionProviders: executionProviders,
+        graphOptimizationLevel: 'all', // Enable all graph optimizations
+        enableMemPattern: true, // Optimize memory usage for better performance
+        enableCpuMemArena: true, // Enable CPU memory arena (helps even with GPU)
+        logSeverityLevel: 0, // Disable verbose logging for better performance
+        logVerbosityLevel: 0,
       });
 
-      console.log('✓ ONNX model loaded successfully');
+      // Log which execution provider was actually used
+      const actualProvider = this.session.providers?.[0] || 'unknown';
+      const isGPU = actualProvider.toLowerCase().includes('webgl');
+      console.log(`✓ ONNX model loaded successfully`);
+      console.log(`  Execution Provider: ${actualProvider} ${isGPU ? '🚀 (GPU Accelerated)' : '⚙️ (CPU Fallback)'}`);
       if (this.labels) {
         console.log(`  Model type: ${this.labels.model_type}`);
         console.log(`  Classes: ${this.labels.num_classes}`);
+      }
+      
+      if (!isGPU) {
+        console.warn('⚠️ GPU acceleration not available. Performance may be slower. Ensure hardware acceleration is enabled in your browser.');
       }
     } catch (error) {
       console.error('Failed to load ONNX model:', error);
