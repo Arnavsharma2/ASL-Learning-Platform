@@ -48,30 +48,48 @@ class ONNXInference {
       }
       this.labels = await labelsResponse.json();
 
-      // Prioritize GPU acceleration (WebGL) over CPU (WASM)
-      // WebGL uses GPU for faster inference, WASM is CPU fallback
-      // ONNX Runtime will automatically use the first available provider
-      const executionProviders = ['webgl', 'wasm'];
+      // Try WebGL first, but gracefully fall back to WASM if unavailable
+      let session: ort.InferenceSession | null = null;
+      let usedProvider = 'unknown';
 
-      // Load ONNX model with GPU-optimized settings
-      this.session = await ort.InferenceSession.create('/models/model.onnx', {
-        executionProviders: executionProviders,
-        graphOptimizationLevel: 'all', // Enable all graph optimizations
-        enableMemPattern: true, // Optimize memory usage for better performance
-        enableCpuMemArena: true, // Enable CPU memory arena (helps even with GPU)
-        logSeverityLevel: 0, // Disable verbose logging for better performance
-        logVerbosityLevel: 0,
-      });
+      try {
+        // Attempt WebGL (GPU) first
+        session = await ort.InferenceSession.create('/models/model.onnx', {
+          executionProviders: ['webgl'],
+          graphOptimizationLevel: 'all',
+          enableMemPattern: true,
+          enableCpuMemArena: true,
+          logSeverityLevel: 0,
+          logVerbosityLevel: 0,
+        });
+        usedProvider = 'webgl';
+        console.log('✓ Using WebGL (GPU) for ONNX inference');
+      } catch (webglError) {
+        console.warn('WebGL backend not available, falling back to WASM (CPU):', webglError);
 
-      // Log successful model load with actual provider being used
-      const actualProvider = (this.session as any).handler?.executionProviders?.[0] || 'unknown';
-      console.log(`ONNX model loaded successfully`);
-      console.log(`Execution Provider: ${actualProvider} (webgl = GPU, wasm = CPU)`);
-      console.log(`GPU Acceleration: Attempting WebGL (will fallback to CPU if unavailable)`);
+        // Fall back to WASM (CPU)
+        session = await ort.InferenceSession.create('/models/model.onnx', {
+          executionProviders: ['wasm'],
+          graphOptimizationLevel: 'all',
+          enableMemPattern: true,
+          enableCpuMemArena: true,
+          logSeverityLevel: 0,
+          logVerbosityLevel: 0,
+        });
+        usedProvider = 'wasm';
+        console.log('✓ Using WASM (CPU) for ONNX inference - this is slower but should still work');
+      }
+
+      this.session = session;
+
+      // Log model details
+      console.log(`ONNX Model Details:`);
+      console.log(`  Provider: ${usedProvider.toUpperCase()} ${usedProvider === 'webgl' ? '(GPU - Fast!)' : '(CPU - Slower but functional)'}`);
       if (this.labels) {
         console.log(`  Model type: ${this.labels.model_type}`);
         console.log(`  Classes: ${this.labels.num_classes}`);
       }
+      console.log(`  Throttled to: ~10 FPS for optimal performance`);
     } catch (error) {
       console.error('Failed to load ONNX model:', error);
       throw error;
