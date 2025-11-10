@@ -46,13 +46,13 @@ ALPHABET_LESSONS = [
 def create_alphabet_lessons():
     """Create all 26 alphabet lessons in the database"""
     if SessionLocal is None:
-        print("❌ Database not configured. Check your DATABASE_URL in .env")
+        print("Database not configured. Check your DATABASE_URL in .env")
         return
 
     db = SessionLocal()
 
     try:
-        print("🎓 Seeding alphabet lessons...")
+        print("Seeding alphabet lessons...")
         print("-" * 50)
 
         created_count = 0
@@ -68,7 +68,7 @@ def create_alphabet_lessons():
             ).first()
 
             if existing:
-                print(f"⏭️  Skipping {letter} - already exists (ID: {existing.id})")
+                print(f"Skipping {letter} - already exists (ID: {existing.id})")
                 skipped_count += 1
                 continue
 
@@ -123,27 +123,27 @@ def create_alphabet_lessons():
                 )
             except Exception as e:
                 # Columns might not exist yet - that's okay, lesson is still created
-                print(f"  ⚠️  Note: Could not set extended fields (they may not exist in schema yet)")
+                print(f"  Note: Could not set extended fields (they may not exist in schema yet)")
                 pass
 
             created_count += 1
-            print(f"✅ Created {letter} - Lesson ID: {new_lesson.id}")
+            print(f"Created {letter} - Lesson ID: {new_lesson.id}")
 
         db.commit()
 
         print("-" * 50)
-        print(f"🎉 Seeding complete!")
+        print(f"Seeding complete!")
         print(f"   Created: {created_count} lessons")
         print(f"   Skipped: {skipped_count} lessons (already exist)")
         print(f"   Total alphabet lessons: {created_count + skipped_count}")
 
         # Verify total count
         total_count = db.query(Lesson).filter(Lesson.category == 'alphabet').count()
-        print(f"\n📊 Database now has {total_count} alphabet lessons")
+        print(f"\nDatabase now has {total_count} alphabet lessons")
 
     except Exception as e:
         db.rollback()
-        print(f"\n❌ Error seeding lessons: {e}")
+        print(f"\nError seeding lessons: {e}")
         import traceback
         traceback.print_exc()
         raise
@@ -153,7 +153,7 @@ def create_alphabet_lessons():
 def delete_all_alphabet_lessons():
     """Delete all alphabet lessons (use with caution!)"""
     if SessionLocal is None:
-        print("❌ Database not configured")
+        print("Database not configured")
         return
 
     db = SessionLocal()
@@ -161,10 +161,10 @@ def delete_all_alphabet_lessons():
     try:
         deleted_count = db.query(Lesson).filter(Lesson.category == 'alphabet').delete()
         db.commit()
-        print(f"🗑️  Deleted {deleted_count} alphabet lessons")
+        print(f"Deleted {deleted_count} alphabet lessons")
     except Exception as e:
         db.rollback()
-        print(f"❌ Error deleting lessons: {e}")
+        print(f"Error deleting lessons: {e}")
         raise
     finally:
         db.close()
@@ -183,12 +183,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.action == 'reset':
-        print("⚠️  WARNING: This will delete all existing alphabet lessons!")
+        print("WARNING: This will delete all existing alphabet lessons!")
         confirm = input("Type 'yes' to confirm: ")
         if confirm.lower() == 'yes':
             delete_all_alphabet_lessons()
             create_alphabet_lessons()
         else:
-            print("❌ Reset cancelled")
+            print("Reset cancelled")
     else:
         create_alphabet_lessons()

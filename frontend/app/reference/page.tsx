@@ -149,7 +149,7 @@ export default function ReferencePage() {
 
               {/* Print-friendly version note */}
               <div className="mt-6 text-center text-sm text-gray-500">
-                <p>💡 Tip: Use your browser's print function to create a physical reference card</p>
+                <p>Tip: Use your browser's print function to create a physical reference card</p>
               </div>
             </>
           )}

@@ -304,7 +304,7 @@ export default function LessonDetailPage() {
           {lesson.common_mistakes && lesson.common_mistakes.length > 0 && (
             <Card className="p-6 mb-6 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
               <h2 className="text-xl font-semibold mb-4 flex items-center">
-                ⚠️ Common Mistakes to Avoid
+                Common Mistakes to Avoid
               </h2>
               <ul className="space-y-2">
                 {lesson.common_mistakes.map((mistake, index) => (

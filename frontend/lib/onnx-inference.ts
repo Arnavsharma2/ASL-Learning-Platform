@@ -65,8 +65,8 @@ class ONNXInference {
 
       // Log successful model load
       // Note: ONNX Runtime will use WebGL (GPU) if available, otherwise fallback to WASM (CPU)
-      console.log(`✓ ONNX model loaded successfully`);
-      console.log(`  🚀 GPU Acceleration: Attempting WebGL (will fallback to CPU if unavailable)`);
+      console.log(`ONNX model loaded successfully`);
+      console.log(`GPU Acceleration: Attempting WebGL (will fallback to CPU if unavailable)`);
       if (this.labels) {
         console.log(`  Model type: ${this.labels.model_type}`);
         console.log(`  Classes: ${this.labels.num_classes}`);

@@ -192,7 +192,7 @@ class Trainer:
                     'label_to_idx': self.label_to_idx,
                     'idx_to_label': self.idx_to_label,
                 }, save_path / 'best_model.pth')
-                print(f"  ✓ Best model saved (Val Acc: {val_acc:.2f}%)")
+                print(f"  Best model saved (Val Acc: {val_acc:.2f}%)")
             else:
                 patience_counter += 1
 

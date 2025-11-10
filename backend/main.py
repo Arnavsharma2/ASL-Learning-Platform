@@ -19,11 +19,11 @@ except Exception as e:
 try:
     from routes import hand_detection
     hand_detection_available = True
-    print("✅ Hand detection endpoint loaded successfully")
+    print("Hand detection endpoint loaded successfully")
 except Exception as e:
-    print(f"⚠️  Hand detection route unavailable: {e}")
-    print("💡 To enable server-side hand detection, install: pip install opencv-python-headless mediapipe")
-    print("✅ Client-side modes (Balanced/Max Accuracy) will still work perfectly!")
+    print(f"Hand detection route unavailable: {e}")
+    print("To enable server-side hand detection, install: pip install opencv-python-headless mediapipe")
+    print("Client-side modes (Balanced/Max Accuracy) will still work perfectly!")
     hand_detection_available = False
 
 app = FastAPI(

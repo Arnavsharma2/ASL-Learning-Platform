@@ -415,7 +415,7 @@ export default function QuizPage() {
                     </div>
                     {userAnswer === option && (
                       <div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">✓</span>
+                        <span className="text-white text-[10px] font-bold">OK</span>
                       </div>
                     )}
                   </button>

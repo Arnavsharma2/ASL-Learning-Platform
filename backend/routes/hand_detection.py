@@ -28,8 +28,8 @@ try:
     )
     MEDIAPIPE_AVAILABLE = True
 except ImportError:
-    print("⚠️  MediaPipe not available. Install with: pip install mediapipe (Python 3.8-3.12 only)")
-    print("⚠️  Hand detection endpoint will return mock data.")
+    print("MediaPipe not available. Install with: pip install mediapipe (Python 3.8-3.12 only)")
+    print("Hand detection endpoint will return mock data.")
     MEDIAPIPE_AVAILABLE = False
 
 

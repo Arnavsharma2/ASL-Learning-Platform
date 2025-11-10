@@ -427,7 +427,7 @@ export function AdaptiveCameraFeed({
           {serverError && !error && (
             <div className="absolute bottom-0 left-0 right-0 bg-yellow-900 bg-opacity-90 text-white p-3">
               <div className="text-center">
-                <p className="font-semibold text-sm mb-1">⚠️ Server Unavailable</p>
+                <p className="font-semibold text-sm mb-1">Server Unavailable</p>
                 <p className="text-xs">Hand detection server is not responding. Switch to Balanced or Max Accuracy mode in Settings.</p>
               </div>
             </div>

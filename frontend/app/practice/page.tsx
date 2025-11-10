@@ -195,7 +195,7 @@ function PracticePageContent() {
         accuracy: correctAttempts / totalAttempts,
         status: 'mastered', // Mark as mastered when completing 10 correct attempts
       });
-      console.log('✅ Lesson marked as mastered!');
+      console.log('Lesson marked as mastered!');
     } catch (error) {
       console.error('Failed to update progress:', error);
     }
@@ -250,7 +250,7 @@ function PracticePageContent() {
               <div className="text-center">
                 <CheckCircle2 className="w-16 h-16 text-green-600 dark:text-green-400 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-green-900 dark:text-green-100 mb-2">
-                  Congratulations! 🎉
+                  Congratulations!
                 </h3>
                 <p className="text-green-800 dark:text-green-200 mb-6">
                   You've successfully completed this lesson with {MASTERY_GOAL} correct attempts!

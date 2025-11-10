@@ -41,7 +41,7 @@ export default function Home() {
           <Card className="p-4 bg-gray-900 border-gray-800 shadow-lg">
             <div className="flex items-start gap-3">
               <div className="flex-1">
-                <h4 className="text-sm font-semibold mb-1 text-white">⏱️ Initial Loading</h4>
+                <h4 className="text-sm font-semibold mb-1 text-white">Initial Loading</h4>
                 <p className="text-xs text-gray-300 leading-relaxed">
                   Please allow 30-45 seconds for services to load initially. The backend is hosted on Render's free tier and may need to spin up.
                 </p>

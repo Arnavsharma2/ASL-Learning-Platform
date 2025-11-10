@@ -47,15 +47,15 @@ def load_model(model_path: str = "models/best_model.pth"):
     # Determine best available device (prioritize GPU)
     if torch.cuda.is_available():
         device = torch.device('cuda')
-        print(f"🚀 GPU Acceleration: CUDA available")
+        print(f"GPU Acceleration: CUDA available")
         print(f"   Device: {torch.cuda.get_device_name(0)}")
         print(f"   Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
     elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
         device = torch.device('mps')  # Apple Silicon GPU
-        print(f"🚀 GPU Acceleration: Apple Metal (MPS) available")
+        print(f"GPU Acceleration: Apple Metal (MPS) available")
     else:
         device = torch.device('cpu')
-        print(f"⚙️  Using CPU (GPU not available)")
+        print(f"Using CPU (GPU not available)")
         print(f"   For better performance, ensure CUDA (NVIDIA) or MPS (Apple Silicon) is available")
 
     print(f"Loading model on device: {device}")
@@ -79,7 +79,7 @@ def load_model(model_path: str = "models/best_model.pth"):
         'num_classes': checkpoint['num_classes']
     }
 
-    print(f"✓ Model loaded: {checkpoint['model_type']}")
+    print(f"Model loaded: {checkpoint['model_type']}")
     print(f"  Number of classes: {checkpoint['num_classes']}")
     print(f"  Signs: {list(labels['label_to_idx'].keys())}")
 

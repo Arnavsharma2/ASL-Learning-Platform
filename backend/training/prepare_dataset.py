@@ -70,7 +70,7 @@ def prepare_dataset(data_dir: str = 'data', output_dir: str = 'data/processed'):
 
     removed_classes = [label for label, count in label_counts.items() if count < min_samples]
     if removed_classes:
-        print(f"\n⚠️  Removed classes with < {min_samples} samples: {removed_classes}")
+        print(f"\nRemoved classes with < {min_samples} samples: {removed_classes}")
         print(f"Remaining samples: {len(X)}")
 
     # Create label mapping
