@@ -4,7 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CameraFeed } from '@/components/CameraFeed';
+import { AdaptiveCameraFeed } from '@/components/AdaptiveCameraFeed';
 import { MediaPipeResults, HandLandmarks } from '@/lib/mediapipe';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
@@ -137,7 +137,7 @@ export default function DataCollectionPage() {
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Camera Feed</h3>
                 <div className="relative">
-                  <CameraFeed
+                  <AdaptiveCameraFeed
                     onHandDetected={handleHandDetection}
                     width={640}
                     height={480}
