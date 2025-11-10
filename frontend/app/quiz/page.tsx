@@ -59,7 +59,7 @@ export default function QuizPage() {
     }
   };
 
-  const categories = Array.from(new Set(allLessons.map(l => l.category)));
+  const categories = Array.from(new Set(allLessons.map(l => l.category))).filter(cat => cat !== 'basic_words');
   // Only get A-Z letters
   const alphabetLetters = allLessons
     .filter(l => {
