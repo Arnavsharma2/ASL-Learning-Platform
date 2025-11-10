@@ -33,7 +33,7 @@ Next.js web application that provides interactive American Sign Language (ASL) l
 - **Reference**: Quick visual reference for all 26 ASL alphabet letters
 - **Dashboard**: View learning statistics, progress, and history (requires login)
 - **Navigation**: Switch between Practice, Time Challenge, Lessons, Quiz, Reference, and Dashboard
-
+ 
 **Note**: Recognition uses optimized balanced settings (2000ms inference throttle) for smooth video performance.
 
 ## Dependencies
