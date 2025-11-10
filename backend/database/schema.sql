@@ -45,23 +45,46 @@ CREATE INDEX IF NOT EXISTS idx_practice_sessions_user_id ON practice_sessions(us
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_timestamp ON practice_sessions(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_lessons_category ON lessons(category);
 
--- Insert sample lessons (ASL alphabet)
+-- Insert all 26 ASL alphabet lessons (A-Z)
 INSERT INTO lessons (title, description, category, difficulty, sign_name) VALUES
     ('Letter A', 'Learn the ASL sign for the letter A', 'alphabet', 'beginner', 'A'),
     ('Letter B', 'Learn the ASL sign for the letter B', 'alphabet', 'beginner', 'B'),
     ('Letter C', 'Learn the ASL sign for the letter C', 'alphabet', 'beginner', 'C'),
     ('Letter D', 'Learn the ASL sign for the letter D', 'alphabet', 'beginner', 'D'),
     ('Letter E', 'Learn the ASL sign for the letter E', 'alphabet', 'beginner', 'E'),
-    ('Hello', 'Learn the ASL sign for Hello', 'greetings', 'beginner', 'hello'),
-    ('Thank You', 'Learn the ASL sign for Thank You', 'greetings', 'beginner', 'thank_you'),
-    ('Please', 'Learn the ASL sign for Please', 'greetings', 'beginner', 'please'),
-    ('Yes', 'Learn the ASL sign for Yes', 'basic_words', 'beginner', 'yes'),
-    ('No', 'Learn the ASL sign for No', 'basic_words', 'beginner', 'no')
+    ('Letter F', 'Learn the ASL sign for the letter F', 'alphabet', 'beginner', 'F'),
+    ('Letter G', 'Learn the ASL sign for the letter G', 'alphabet', 'beginner', 'G'),
+    ('Letter H', 'Learn the ASL sign for the letter H', 'alphabet', 'beginner', 'H'),
+    ('Letter I', 'Learn the ASL sign for the letter I', 'alphabet', 'beginner', 'I'),
+    ('Letter J', 'Learn the ASL sign for the letter J', 'alphabet', 'beginner', 'J'),
+    ('Letter K', 'Learn the ASL sign for the letter K', 'alphabet', 'beginner', 'K'),
+    ('Letter L', 'Learn the ASL sign for the letter L', 'alphabet', 'beginner', 'L'),
+    ('Letter M', 'Learn the ASL sign for the letter M', 'alphabet', 'beginner', 'M'),
+    ('Letter N', 'Learn the ASL sign for the letter N', 'alphabet', 'beginner', 'N'),
+    ('Letter O', 'Learn the ASL sign for the letter O', 'alphabet', 'beginner', 'O'),
+    ('Letter P', 'Learn the ASL sign for the letter P', 'alphabet', 'beginner', 'P'),
+    ('Letter Q', 'Learn the ASL sign for the letter Q', 'alphabet', 'beginner', 'Q'),
+    ('Letter R', 'Learn the ASL sign for the letter R', 'alphabet', 'beginner', 'R'),
+    ('Letter S', 'Learn the ASL sign for the letter S', 'alphabet', 'beginner', 'S'),
+    ('Letter T', 'Learn the ASL sign for the letter T', 'alphabet', 'beginner', 'T'),
+    ('Letter U', 'Learn the ASL sign for the letter U', 'alphabet', 'beginner', 'U'),
+    ('Letter V', 'Learn the ASL sign for the letter V', 'alphabet', 'beginner', 'V'),
+    ('Letter W', 'Learn the ASL sign for the letter W', 'alphabet', 'beginner', 'W'),
+    ('Letter X', 'Learn the ASL sign for the letter X', 'alphabet', 'beginner', 'X'),
+    ('Letter Y', 'Learn the ASL sign for the letter Y', 'alphabet', 'beginner', 'Y'),
+    ('Letter Z', 'Learn the ASL sign for the letter Z', 'alphabet', 'beginner', 'Z')
 ON CONFLICT DO NOTHING;
 
 -- Row Level Security (RLS) Policies
 ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE practice_sessions ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist (for idempotency)
+DROP POLICY IF EXISTS "Users can view their own progress" ON user_progress;
+DROP POLICY IF EXISTS "Users can insert their own progress" ON user_progress;
+DROP POLICY IF EXISTS "Users can update their own progress" ON user_progress;
+DROP POLICY IF EXISTS "Users can view their own sessions" ON practice_sessions;
+DROP POLICY IF EXISTS "Users can insert their own sessions" ON practice_sessions;
 
 -- Users can only read/write their own progress
 CREATE POLICY "Users can view their own progress"
@@ -87,6 +110,10 @@ CREATE POLICY "Users can insert their own sessions"
 
 -- Everyone can read lessons (public data)
 ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing lesson policies if they exist
+DROP POLICY IF EXISTS "Anyone can view lessons" ON lessons;
+DROP POLICY IF EXISTS "Authenticated users can create lessons" ON lessons;
 
 CREATE POLICY "Anyone can view lessons"
     ON lessons FOR SELECT

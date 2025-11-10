@@ -51,8 +51,14 @@ export default function LearnPage() {
       setLoading(true);
       const data = await lessonsApi.getAll(selectedCategory || undefined);
 
+      // Filter to only A-Z letters
+      const alphabetOnly = data.filter((lesson: Lesson) => {
+        const signName = lesson.sign_name;
+        return signName && signName.length === 1 && /^[A-Z]$/.test(signName);
+      });
+
       // Sort lessons with alphabet category first, then alphabetically by sign_name within each category
-      const sorted = data.sort((a: Lesson, b: Lesson) => {
+      const sorted = alphabetOnly.sort((a: Lesson, b: Lesson) => {
         // Alphabet category comes first
         if (a.category === 'alphabet' && b.category !== 'alphabet') return -1;
         if (a.category !== 'alphabet' && b.category === 'alphabet') return 1;
@@ -118,7 +124,7 @@ export default function LearnPage() {
     return <Circle className="w-5 h-5 text-gray-400 dark:text-gray-600" />;
   };
 
-  const categories = ['alphabet', 'greetings', 'basic_words'];
+  const categories = ['alphabet'];
 
   // Calculate stats
   const totalLessons = lessons.length;
