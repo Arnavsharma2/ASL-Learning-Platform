@@ -142,6 +142,12 @@ export default function LessonDetailPage() {
     return 'text-gray-600 dark:text-gray-400';
   };
 
+  // ASL alphabet image URLs from a reliable source
+  const getASLImageUrl = (letter: string) => {
+    // Using ASL alphabet images from a public CDN
+    return `https://www.lifeprint.com/asl101/fingerspelling/abc-gifs/${letter.toLowerCase()}.gif`;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -243,20 +249,22 @@ export default function LessonDetailPage() {
             {/* Visual Reference */}
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Sign Reference</h2>
-              {lesson.image_url ? (
+              <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden mb-4">
                 <img
-                  src={lesson.image_url}
-                  alt={`${lesson.title} sign`}
-                  className="w-full rounded-lg mb-4"
+                  src={getASLImageUrl(lesson.sign_name)}
+                  alt={`ASL sign for letter ${lesson.sign_name}`}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    // Fallback if image fails to load
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<div class="text-center"><div class="text-6xl font-bold text-gray-400 mb-2">${lesson.sign_name}</div><p class="text-sm text-gray-500">Letter: ${lesson.sign_name}</p></div>`;
+                    }
+                  }}
                 />
-              ) : (
-                <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center mb-4">
-                  <div className="text-center">
-                    <div className="text-6xl mb-2">{lesson.sign_name}</div>
-                    <p className="text-sm text-gray-500">Sign: {lesson.sign_name}</p>
-                  </div>
-                </div>
-              )}
+              </div>
               {lesson.video_url && (
                 <a
                   href={lesson.video_url}

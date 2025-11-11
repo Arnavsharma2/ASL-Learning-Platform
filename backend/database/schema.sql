@@ -46,6 +46,9 @@ CREATE INDEX IF NOT EXISTS idx_practice_sessions_user_id ON practice_sessions(us
 CREATE INDEX IF NOT EXISTS idx_practice_sessions_timestamp ON practice_sessions(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_lessons_category ON lessons(category);
 
+-- Delete existing alphabet lessons to avoid duplicates
+DELETE FROM lessons WHERE category = 'alphabet';
+
 -- Insert all 26 ASL alphabet lessons (A-Z)
 INSERT INTO lessons (title, description, category, difficulty, sign_name) VALUES
     ('Letter A', 'Learn the ASL sign for the letter A', 'alphabet', 'beginner', 'A'),

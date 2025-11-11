@@ -50,11 +50,6 @@ function PracticePageContent() {
   const [modelLoading, setModelLoading] = useState(true);
   const [modelError, setModelError] = useState<string | null>(null);
 
-  // Performance monitoring (optional - can be removed after testing)
-  const [fps, setFps] = useState<number>(0);
-  const frameCountRef = useRef<number>(0);
-  const lastFpsUpdateRef = useRef<number>(Date.now());
-
   // Guided practice state
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [totalAttempts, setTotalAttempts] = useState(0);
@@ -212,14 +207,6 @@ function PracticePageContent() {
 
       // Run inference asynchronously to avoid blocking video rendering
       // The video continues to render while inference runs in the background
-
-      // Performance monitoring: track FPS
-      frameCountRef.current++;
-      if (now - lastFpsUpdateRef.current >= 1000) {
-        setFps(frameCountRef.current);
-        frameCountRef.current = 0;
-        lastFpsUpdateRef.current = now;
-      }
 
       try {
         // Extract landmarks from first detected hand
@@ -598,15 +585,6 @@ function PracticePageContent() {
                   <li>• Hold sign steady for 2-3 seconds</li>
                   {targetSign && <li>• Aim for 80%+ confidence for best results</li>}
                 </ul>
-                {fps > 0 && (
-                  <div className="mt-4 pt-4 border-t border-gray-800">
-                    <p className="text-xs text-gray-500">
-                      Performance: <span className="text-green-400 font-semibold">{fps} FPS</span>
-                      <br />
-                      <span className="text-gray-600">Inference throttled to ~10 FPS for optimal performance</span>
-                    </p>
-                  </div>
-                )}
               </Card>
 
               <Card className="p-6 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
