@@ -65,17 +65,18 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md p-8 text-center">
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-radial from-white/5 via-transparent to-transparent blur-3xl" />
+        <Card className="w-full max-w-md p-8 text-center bg-gray-900/50 border-gray-800 backdrop-blur-md relative z-10">
           <div className="mb-4">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-green-900/20 rounded-full flex items-center justify-center mx-auto border border-green-800">
+              <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
           </div>
-          <h2 className="text-xl font-semibold mb-2">Account Created!</h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h2 className="text-xl font-semibold mb-2 text-white">Account Created!</h2>
+          <p className="text-gray-400">
             Please check your email to verify your account, then sign in.
           </p>
         </Card>
@@ -84,22 +85,25 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-radial from-white/5 via-transparent to-transparent blur-3xl" />
+
+      <Card className="w-full max-w-md p-8 bg-gray-900/50 border-gray-800 backdrop-blur-md relative z-10">
         <div className="mb-6">
           <Link href="/">
-            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+            <h1 className="text-2xl font-light text-white mb-2 hover:text-gray-300 transition-colors">
               ASL Learning
             </h1>
           </Link>
-          <h2 className="text-xl font-semibold">Sign Up</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <h2 className="text-xl font-semibold text-white">Sign Up</h2>
+          <p className="text-sm text-gray-400 mt-1">
             Create an account to start learning
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-red-700 dark:text-red-400 text-sm">
+          <div className="mb-4 p-3 bg-red-900/20 border border-red-800 rounded text-red-400 text-sm">
             {error}
           </div>
         )}
@@ -115,7 +119,7 @@ export default function SignUpPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all"
               placeholder="you@example.com"
             />
           </div>
@@ -131,7 +135,7 @@ export default function SignUpPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all"
               placeholder="••••••••"
             />
             <p className="text-xs text-gray-500 mt-1">At least 6 characters</p>
@@ -148,7 +152,7 @@ export default function SignUpPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all"
               placeholder="••••••••"
             />
           </div>
@@ -161,10 +165,10 @@ export default function SignUpPage() {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+              <div className="w-full border-t border-gray-700"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
+              <span className="px-2 bg-gray-900 text-gray-400">Or continue with</span>
             </div>
           </div>
 
@@ -197,9 +201,9 @@ export default function SignUpPage() {
           </Button>
         </div>
 
-        <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-6 text-center text-sm text-gray-400">
           Already have an account?{' '}
-          <Link href="/auth/login" className="text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/auth/login" className="text-white hover:text-gray-300 underline transition-colors">
             Sign in
           </Link>
         </p>

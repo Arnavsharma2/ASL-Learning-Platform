@@ -65,8 +65,11 @@ export default function ReferencePage() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">ASL Alphabet Reference</h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h1 className="text-4xl font-light mb-2 relative inline-block">
+              ASL Alphabet Reference
+              <div className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-white via-white/50 to-transparent" />
+            </h1>
+            <p className="text-gray-400 mt-4">
               Quick reference guide for all 26 letters of the ASL alphabet
             </p>
           </div>
@@ -85,7 +88,7 @@ export default function ReferencePage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
                 {lessons.map((lesson) => (
                   <Link key={lesson.id} href={`/learn/${lesson.id}`}>
-                    <Card className="p-4 hover:shadow-lg transition-all cursor-pointer group h-full">
+                    <Card className="p-4 bg-gray-900/30 border-gray-800 hover:bg-gray-900/50 hover:border-gray-700 transition-all cursor-pointer group h-full">
                       <div className="flex flex-col items-center space-y-3">
                         {/* Letter badge */}
                         <Badge className="text-2xl px-4 py-2 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
@@ -93,7 +96,7 @@ export default function ReferencePage() {
                         </Badge>
 
                         {/* Image */}
-                        <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
+                        <div className="w-full aspect-square bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
                           <img
                             src={getASLImageUrl(lesson.sign_name)}
                             alt={`ASL sign for letter ${lesson.sign_name}`}
@@ -111,7 +114,7 @@ export default function ReferencePage() {
                         </div>
 
                         {/* Title */}
-                        <p className="text-sm font-medium text-center group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        <p className="text-sm font-medium text-center text-gray-300 group-hover:text-blue-400 transition-colors">
                           Letter {lesson.sign_name}
                         </p>
                       </div>
@@ -121,9 +124,9 @@ export default function ReferencePage() {
               </div>
 
               {/* Tips section */}
-              <Card className="p-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-                <h2 className="text-xl font-semibold mb-4">Tips for Learning</h2>
-                <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+              <Card className="p-6 bg-blue-900/20 border-blue-800/50">
+                <h2 className="text-xl font-semibold mb-4 text-gray-200">Tips for Learning</h2>
+                <ul className="space-y-2 text-gray-300">
                   <li className="flex items-start">
                     <span className="text-blue-600 mr-2">•</span>
                     <span>Practice each letter until you can form it without looking at the reference</span>

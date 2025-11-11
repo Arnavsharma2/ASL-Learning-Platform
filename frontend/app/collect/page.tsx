@@ -115,7 +115,7 @@ export default function DataCollectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-black text-white">
       <Navigation />
 
       <main className="container mx-auto px-4 py-8">
@@ -125,8 +125,11 @@ export default function DataCollectionPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h2 className="text-3xl font-bold mb-2">Data Collection Tool</h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h2 className="text-4xl font-light mb-2 relative inline-block">
+              Data Collection Tool
+              <div className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-white via-white/50 to-transparent" />
+            </h2>
+            <p className="text-gray-400 mt-4">
               Collect training data for ASL sign recognition model
             </p>
           </motion.div>
@@ -134,8 +137,8 @@ export default function DataCollectionPage() {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Camera Feed */}
             <div className="lg:col-span-2 space-y-4">
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Camera Feed</h3>
+              <Card className="p-6 bg-gray-900/30 border-gray-800">
+                <h3 className="text-lg font-semibold mb-4 text-gray-200">Camera Feed</h3>
                 <div className="relative">
                   <AdaptiveCameraFeed
                     onHandDetected={handleHandDetection}
@@ -180,11 +183,11 @@ export default function DataCollectionPage() {
                 </div>
 
                 {selectedSign && (
-                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <p className="text-sm">
+                  <div className="mt-4 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg">
+                    <p className="text-sm text-gray-300">
                       <strong>Selected Sign:</strong> {selectedSign}
                     </p>
-                    <p className="text-sm">
+                    <p className="text-sm text-gray-300">
                       <strong>Samples Collected:</strong> {getSignSampleCount(selectedSign)}
                     </p>
                   </div>
@@ -192,9 +195,9 @@ export default function DataCollectionPage() {
               </Card>
 
               {/* Instructions */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Instructions</h3>
-                <ol className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <Card className="p-6 bg-gray-900/30 border-gray-800">
+                <h3 className="text-lg font-semibold mb-4 text-gray-200">Instructions</h3>
+                <ol className="space-y-2 text-sm text-gray-400">
                   <li>1. Select a sign from the right panel</li>
                   <li>2. Position your hand in the camera view</li>
                   <li>3. Click "Start Recording" (3-second countdown)</li>
@@ -209,8 +212,8 @@ export default function DataCollectionPage() {
             {/* Sign Selection */}
             <div className="space-y-4">
               {/* Alphabet */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Alphabet (A-Z)</h3>
+              <Card className="p-6 bg-gray-900/30 border-gray-800">
+                <h3 className="text-lg font-semibold mb-4 text-gray-200">Alphabet (A-Z)</h3>
                 <div className="grid grid-cols-5 gap-2">
                   {ASL_SIGNS.map((sign) => (
                     <Button
@@ -231,8 +234,8 @@ export default function DataCollectionPage() {
               </Card>
 
               {/* Greetings/Words */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Common Words</h3>
+              <Card className="p-6 bg-gray-900/30 border-gray-800">
+                <h3 className="text-lg font-semibold mb-4 text-gray-200">Common Words</h3>
                 <div className="space-y-2">
                   {GREETINGS.map((sign) => (
                     <Button
@@ -253,16 +256,16 @@ export default function DataCollectionPage() {
               </Card>
 
               {/* Stats & Actions */}
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Dataset Stats</h3>
+              <Card className="p-6 bg-gray-900/30 border-gray-800">
+                <h3 className="text-lg font-semibold mb-4 text-gray-200">Dataset Stats</h3>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Samples</p>
-                    <p className="text-2xl font-bold">{samples.length}</p>
+                    <p className="text-sm text-gray-400">Total Samples</p>
+                    <p className="text-2xl font-bold text-white">{samples.length}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Signs with Data</p>
-                    <p className="text-2xl font-bold">
+                    <p className="text-sm text-gray-400">Signs with Data</p>
+                    <p className="text-2xl font-bold text-white">
                       {new Set(samples.map(s => s.sign)).size}
                     </p>
                   </div>

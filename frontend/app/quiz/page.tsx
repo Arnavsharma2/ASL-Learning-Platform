@@ -217,7 +217,7 @@ export default function QuizPage() {
                   }`}
                 >
                   <h3 className="font-semibold mb-1">Random - All</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-400">
                     Random signs from all categories
                   </p>
                 </button>
@@ -254,8 +254,8 @@ export default function QuizPage() {
 
             {/* Category Selection (for random-category mode) */}
             {selectionMode === 'random-category' && (
-              <Card className="p-6 mb-6">
-                <h2 className="text-xl font-semibold mb-4">Select Category</h2>
+              <Card className="p-6 mb-6 bg-gray-900/30 border-gray-800">
+                <h2 className="text-xl font-semibold mb-4 text-gray-200">Select Category</h2>
                 <div className="flex gap-2 flex-wrap">
                   {categories.map((cat) => (
                     <Button
@@ -272,8 +272,8 @@ export default function QuizPage() {
 
             {/* Letter Selection (for custom mode) */}
             {selectionMode === 'custom' && (
-              <Card className="p-6 mb-6">
-                <h2 className="text-xl font-semibold mb-4">
+              <Card className="p-6 mb-6 bg-gray-900/30 border-gray-800">
+                <h2 className="text-xl font-semibold mb-4 text-gray-200">
                   Select Letters ({selectedLetters.length} selected)
                 </h2>
                 <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 mb-4">
@@ -283,8 +283,8 @@ export default function QuizPage() {
                       onClick={() => toggleLetter(letter)}
                       className={`p-3 rounded-lg border-2 font-semibold transition-all ${
                         selectedLetters.includes(letter)
-                          ? 'border-blue-500 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                          ? 'border-blue-500 bg-blue-900/30 text-blue-300'
+                          : 'border-gray-700 hover:border-blue-300'
                       }`}
                     >
                       {letter}
@@ -309,8 +309,8 @@ export default function QuizPage() {
             )}
 
             {/* Number of Questions */}
-            <Card className="p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Number of Questions</h2>
+            <Card className="p-6 mb-6 bg-gray-900/30 border-gray-800">
+              <h2 className="text-xl font-semibold mb-4 text-gray-200">Number of Questions</h2>
               <div className="flex items-center gap-4">
                 <input
                   type="range"
@@ -376,8 +376,8 @@ export default function QuizPage() {
             </div>
 
             {/* Question */}
-            <Card className="p-8 mb-6">
-              <h2 className="text-2xl font-semibold mb-4 text-center">
+            <Card className="p-8 mb-6 bg-gray-900/30 border-gray-800">
+              <h2 className="text-2xl font-semibold mb-4 text-center text-gray-200">
                 Which sign represents the letter:
               </h2>
 
@@ -388,7 +388,7 @@ export default function QuizPage() {
                 </span>
               </div>
 
-              <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-center text-gray-400 mb-6">
                 Select the correct ASL sign for this letter
               </p>
 
@@ -400,11 +400,11 @@ export default function QuizPage() {
                     onClick={() => handleAnswer(option)}
                     className={`p-4 rounded-lg border-2 transition-all relative ${
                       userAnswer === option
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                        ? 'border-blue-500 bg-blue-900/20'
+                        : 'border-gray-700 hover:border-blue-300'
                     }`}
                   >
-                    <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="aspect-square bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
                       {!imageErrors[option] ? (
                         <img
                           src={getASLImageUrl(option)}
@@ -458,17 +458,17 @@ export default function QuizPage() {
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             {/* Results Header */}
-            <Card className="p-8 mb-6 text-center">
-              <h1 className="text-4xl font-bold mb-4">Quiz Complete!</h1>
+            <Card className="p-8 mb-6 text-center bg-gray-900/30 border-gray-800">
+              <h1 className="text-4xl font-bold mb-4 text-white">Quiz Complete!</h1>
 
               {/* Score Circle */}
               <div className="my-8">
-                <div className="inline-flex items-center justify-center w-48 h-48 rounded-full border-8 border-blue-500 bg-blue-50 dark:bg-blue-900/20">
+                <div className="inline-flex items-center justify-center w-48 h-48 rounded-full border-8 border-blue-500 bg-blue-900/20">
                   <div className="text-center">
-                    <div className="text-6xl font-bold text-blue-600 dark:text-blue-400">
+                    <div className="text-6xl font-bold text-blue-400">
                       {percentage}%
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    <div className="text-sm text-gray-400 mt-2">
                       {results.correct} / {results.total} correct
                     </div>
                   </div>
@@ -478,22 +478,22 @@ export default function QuizPage() {
               {/* Performance Message */}
               <div className="mb-6">
                 {percentage === 100 && (
-                  <p className="text-2xl font-semibold text-green-600 dark:text-green-400">
+                  <p className="text-2xl font-semibold text-green-400">
                     Perfect! Outstanding work!
                   </p>
                 )}
                 {percentage >= 80 && percentage < 100 && (
-                  <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400">
+                  <p className="text-2xl font-semibold text-blue-400">
                     Great job! Keep it up!
                   </p>
                 )}
                 {percentage >= 60 && percentage < 80 && (
-                  <p className="text-2xl font-semibold text-yellow-600 dark:text-yellow-400">
+                  <p className="text-2xl font-semibold text-yellow-400">
                     Good effort! Practice makes perfect!
                   </p>
                 )}
                 {percentage < 60 && (
-                  <p className="text-2xl font-semibold text-orange-600 dark:text-orange-400">
+                  <p className="text-2xl font-semibold text-orange-400">
                     Keep practicing! You'll get there!
                   </p>
                 )}
@@ -501,8 +501,8 @@ export default function QuizPage() {
             </Card>
 
             {/* Detailed Results */}
-            <Card className="p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Review Your Answers</h2>
+            <Card className="p-6 mb-6 bg-gray-900/30 border-gray-800">
+              <h2 className="text-xl font-semibold mb-4 text-gray-200">Review Your Answers</h2>
               <div className="space-y-3">
                 {quizQuestions.map((question, index) => {
                   const userAnswer = userAnswers[index];
@@ -513,8 +513,8 @@ export default function QuizPage() {
                       key={index}
                       className={`p-4 rounded-lg border-2 ${
                         isCorrect
-                          ? 'border-green-200 bg-green-50 dark:bg-green-900/20'
-                          : 'border-red-200 bg-red-50 dark:bg-red-900/20'
+                          ? 'border-green-800 bg-green-900/20'
+                          : 'border-red-800 bg-red-900/20'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -529,14 +529,14 @@ export default function QuizPage() {
                         {!isCorrect && (
                           <div className="text-right space-y-1">
                             <div className="text-sm">
-                              <span className="text-gray-600 dark:text-gray-400">You answered:</span>{' '}
-                              <span className="font-semibold text-red-600 dark:text-red-400">
+                              <span className="text-gray-400">You answered:</span>{' '}
+                              <span className="font-semibold text-red-400">
                                 {userAnswer || 'Not answered'}
                               </span>
                             </div>
                             <div className="text-sm">
-                              <span className="text-gray-600 dark:text-gray-400">Correct answer:</span>{' '}
-                              <span className="font-semibold text-green-600 dark:text-green-400">
+                              <span className="text-gray-400">Correct answer:</span>{' '}
+                              <span className="font-semibold text-green-400">
                                 {question.sign_name}
                               </span>
                             </div>
@@ -544,7 +544,7 @@ export default function QuizPage() {
                         )}
                         {isCorrect && (
                           <div className="text-right">
-                            <div className="text-sm font-semibold text-green-600 dark:text-green-400">
+                            <div className="text-sm font-semibold text-green-400">
                               Correct!
                             </div>
                           </div>
