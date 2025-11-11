@@ -28,6 +28,11 @@ export default function TimeChallengePage() {
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [finalTime, setFinalTime] = useState<number>(0);
   const [correctCount, setCorrectCount] = useState<number>(0);
+  
+  // Refs to track current values for use in callbacks
+  const currentLetterIndexRef = useRef(0);
+  const challengeLettersRef = useRef<string[]>([]);
+  const startTimeRef = useRef<number>(0);
 
   // Countdown state
   const [countdownValue, setCountdownValue] = useState<number>(3);
@@ -45,6 +50,7 @@ export default function TimeChallengePage() {
   const [confidence, setConfidence] = useState<number>(0);
   const lastInferenceRef = useRef<number>(0);
   const isProcessingRef = useRef<boolean>(false);
+  const isMovingToNextRef = useRef<boolean>(false);
   // Use settings throttle value (2000ms for balanced mode)
   const INFERENCE_THROTTLE_MS = settings.inferenceThrottleMs;
 
@@ -151,6 +157,7 @@ export default function TimeChallengePage() {
     setMode('countdown');
     setCountdownValue(3);
     setCorrectCount(0);
+    isMovingToNextRef.current = false;
 
     // Countdown
     const countdownInterval = setInterval(() => {
@@ -186,6 +193,46 @@ export default function TimeChallengePage() {
       console.error('Failed to initialize camera:', err);
     }
   };
+
+  // Update refs when state changes
+  useEffect(() => {
+    currentLetterIndexRef.current = currentLetterIndex;
+  }, [currentLetterIndex]);
+
+  useEffect(() => {
+    challengeLettersRef.current = challengeLetters;
+  }, [challengeLetters]);
+
+  useEffect(() => {
+    startTimeRef.current = startTime;
+  }, [startTime]);
+
+  // Move to next letter
+  const moveToNextLetter = useCallback(() => {
+    // Prevent multiple rapid calls
+    if (isMovingToNextRef.current) return;
+    isMovingToNextRef.current = true;
+
+    const nextIndex = currentLetterIndexRef.current + 1;
+
+    if (nextIndex >= challengeLettersRef.current.length) {
+      // Challenge complete!
+      const totalTime = Date.now() - startTimeRef.current;
+      setFinalTime(totalTime);
+      setMode('results');
+      stopCamera();
+      isMovingToNextRef.current = false;
+    } else {
+      // Move to next letter
+      setCurrentLetterIndex(nextIndex);
+      setLetterStartTime(Date.now());
+      setShowHint(false);
+      // Reset flag after a short delay to allow state to update
+      setTimeout(() => {
+        isMovingToNextRef.current = false;
+      }, 100);
+    }
+  }, []);
 
   // Handle hand detection and recognition
   const handleHandDetection = useCallback(async (results: MediaPipeResults) => {
@@ -234,9 +281,10 @@ export default function TimeChallengePage() {
       setDetectedSign(prediction.sign);
       setConfidence(prediction.confidence);
 
-      // Check if detected sign matches target
-      const targetLetter = challengeLetters[currentLetterIndex];
-      if (prediction.sign === targetLetter && prediction.confidence >= 0.80) {
+      // Check if detected sign matches target - use refs to get latest values
+      const targetLetter = challengeLettersRef.current[currentLetterIndexRef.current];
+      
+      if (prediction.sign === targetLetter && prediction.confidence >= 0.80 && !isMovingToNextRef.current) {
         // Correct sign detected! Increment counter and move to next letter
         setCorrectCount(prev => prev + 1);
         moveToNextLetter();
@@ -246,25 +294,7 @@ export default function TimeChallengePage() {
     } finally {
       isProcessingRef.current = false;
     }
-  }, [mode, challengeLetters, currentLetterIndex, showHint]);
-
-  // Move to next letter
-  const moveToNextLetter = () => {
-    const nextIndex = currentLetterIndex + 1;
-
-    if (nextIndex >= challengeLetters.length) {
-      // Challenge complete!
-      const totalTime = Date.now() - startTime;
-      setFinalTime(totalTime);
-      setMode('results');
-      stopCamera();
-    } else {
-      // Move to next letter
-      setCurrentLetterIndex(nextIndex);
-      setLetterStartTime(Date.now());
-      setShowHint(false);
-    }
-  };
+  }, [mode, showHint, moveToNextLetter]);
 
   // Stop camera
   const stopCamera = () => {
@@ -317,6 +347,7 @@ export default function TimeChallengePage() {
     setDetectedSign('');
     setConfidence(0);
     setShowHint(false);
+    isMovingToNextRef.current = false;
     stopCamera();
   };
 
