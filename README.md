@@ -15,10 +15,6 @@
 
 ---
 
-<!-- Add a demo GIF or screenshot here — drag and drop into the GitHub editor -->
-
----
-
 ## Technical Highlights
 
 - **On-device ML inference** — The recognition pipeline runs 100% in the browser. A PyTorch MLP trained on 87,000 images was converted to ONNX format and served via ONNX Runtime Web with WebGL GPU acceleration, achieving **<50ms inference latency** with zero server roundtrips.
